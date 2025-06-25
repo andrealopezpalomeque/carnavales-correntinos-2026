@@ -32,9 +32,9 @@
 import { ref } from 'vue'
 
 const images = [
-  { src: '/images/carnaval1.jpg', title: 'Comparsa Sapucay' },
-  { src: '/images/carnaval2.jpg', title: 'Corsos 2024' },
-  { src: '/images/carnaval3.jpg', title: 'Cierre de Carnaval' },
+  { src: '/images/carnaval1@2x.png', title: 'Comparsa Sapucay' },
+  { src: '/images/carnaval2@2x.png', title: 'Corsos 2024' },
+  { src: '/images/carnaval3@2x.png', title: 'Cierre de Carnaval' },
 ]
 
 const current = ref(0)

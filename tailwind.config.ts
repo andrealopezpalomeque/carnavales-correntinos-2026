@@ -10,7 +10,10 @@ module.exports = {
   ],
   theme: {
     extend: {
-      // Put custom colors/fonts here if you want!
+      fontFamily: {
+        sans: ['Poppins', 'Arial', 'sans-serif'],
+      },
+      // Put other custom colors/fonts here if you want!
     },
     // Example breakpoints (customize if you want)
     screens: {

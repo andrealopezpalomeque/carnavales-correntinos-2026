@@ -1,4 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
@@ -6,8 +5,24 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
     '@vueuse/nuxt',
+    '@nuxtjs/google-fonts',
   ],
-   runtimeConfig: {
+  css: [
+    '@/assets/css/style.css',
+  ],
+  googleFonts: {
+    useStylesheet: true,
+    display: 'swap',
+    families: {
+      Inter: {
+        wght: [400, 500, 700],
+      },
+      Poppins: {
+        wght: [400, 500, 600, 700],
+      }, 
+    },
+  },
+  runtimeConfig: {
     // Private keys are only available on server
     // apiSecret: '...',
     

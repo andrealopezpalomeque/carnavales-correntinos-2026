@@ -9,7 +9,7 @@
       <h2 class="text-xl font-bold my-8">Galería (Próximamente)</h2>
     </section>
     <section id="fun-facts" class="min-h-[30vh] flex flex-col items-center justify-center">
-      <h2 class="text-xl font-bold my-8">Curiosidades (Próximamente)</h2>
+      <FunFacts/>
     </section>
   </div>
 </template>
@@ -17,4 +17,5 @@
 <script setup>
 import MenuBar from '~/components/MenuBar.vue'
 import Countdown from '~/components/Countdown.vue'
+import FunFacts from '~/components/FunFacts.vue'
 </script>

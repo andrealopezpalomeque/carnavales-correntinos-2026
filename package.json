@@ -17,6 +17,7 @@
     "@vueuse/core": "^13.4.0",
     "@vueuse/nuxt": "^13.4.0",
     "firebase": "^11.9.1",
+    "lucide-vue-next": "^0.525.0",
     "nuxt": "^3.17.5",
     "pinia": "^3.0.3",
     "vue": "^3.5.17",

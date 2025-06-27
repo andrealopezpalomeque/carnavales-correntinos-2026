@@ -15,9 +15,9 @@
           :alt="image.alt"
           class="w-full h-full object-cover"
         />
-        <!-- Optional overlay with text -->
-        <div class="absolute inset-0 bg-opacity-30 flex items-center justify-center">
-          <div class="text-center text-white px-4">
+        <!-- Overlay with text -->
+        <div class="absolute inset-0 bg-opacity-30 flex items-baseline-last pb-10 justify-center">
+          <div class="text-center text-white px-4 bg-green-600 opacity-80">
             <h2 class="text-2xl md:text-4xl lg:text-5xl font-bold mb-2">{{ image.title }}</h2>
             <p class="text-sm md:text-lg lg:text-xl opacity-90">{{ image.description }}</p>
           </div>
@@ -81,7 +81,7 @@ const images = ref([
     src: '/images/carnaval2@2x.png',
     alt: 'Primera aparición en el Palco Oficial',
     title: 'Primera aparición en el Palco Oficial',
-    description: 'Inicio de una larga aventura por el mismo'
+    description: 'Inicio de una larga aventura'
   },
   {
    src: '/images/carnaval3@2x.png',

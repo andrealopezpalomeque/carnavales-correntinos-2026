@@ -1,28 +1,134 @@
 <template>
-  <section id="fun-facts" class="py-12 flex flex-col items-center">
-    <h2 class="text-xl font-bold mb-6">Curiosidades del Carnaval</h2>
-    <div v-if="factsStore.isLoading" class="text-center py-4">
-      Cargando curiosidades...
-    </div>
-    <div 
-      v-else
-      v-for="fact in factsStore.facts" 
-      :key="fact.id" 
-      class="bg-white rounded-lg shadow p-4 m-2 w-full max-w-md flex justify-between items-center"
-    >
-      <span>{{ fact.text }}</span>
-      <div class="flex items-center">
-        <span class="text-gray-500 mr-2 text-sm">{{ fact.votes }} votos</span>
-        <button
-          class="flex items-center bg-primary text-white px-3 py-1 rounded hover:bg-secondary transition-colors"
-          @click="factsStore.voteFact(fact.id)"
-          :disabled="factsStore.votingId === fact.id"
-          aria-label="Votar por esta curiosidad"
+  <section id="fun-facts" class="py-16 px-4 bg-gradient-to-br from-green-50 to-emerald-50 min-h-screen">
+    <div class="max-w-6xl mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-12">
+        <h2 class="text-4xl font-bold text-gray-800 mb-4 font-inter">
+          🎭 Curiosidades del Carnaval
+        </h2>
+        <p class="text-gray-600 text-lg max-w-2xl mx-auto font-inter">
+          Descubre datos fascinantes sobre la celebración más esperada del año.
+        </p>
+      </div>
+
+      <!-- Loading State -->
+      <div v-if="factsStore.isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div 
+          v-for="n in 6" 
+          :key="n"
+          class="bg-white rounded-2xl shadow-lg p-6 animate-pulse"
         >
-          <span class="mr-1">👍</span>
-          <span v-if="factsStore.votingId === fact.id">...</span>
-          <span v-else>Votar</span>
-        </button>
+          <div class="h-4 bg-gray-200 rounded mb-4"></div>
+          <div class="h-4 bg-gray-200 rounded mb-4 w-3/4"></div>
+          <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div class="flex justify-between items-center mt-6">
+            <div class="h-6 bg-gray-200 rounded w-20"></div>
+            <div class="h-8 bg-gray-200 rounded w-24"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Facts Grid -->
+      <div 
+        v-else
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
+        <div
+          v-for="(fact, index) in factsStore.facts"
+          :key="fact.id"
+          class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden border border-gray-100"
+          :style="{ animationDelay: `${index * 100}ms` }"
+        >
+          <!-- Card Header -->
+          <div class="bg-gradient-to-r from-green-500 to-emerald-500 h-2"></div>
+          
+          <!-- Card Content -->
+          <div class="p-6">
+            <!-- Fact Icon -->
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full flex items-center justify-center mr-3">
+                <span class="text-xl">🎪</span>
+              </div>
+              <div class="text-sm text-gray-500 font-medium font-inter">
+                Curiosidad #{{ index + 1 }}
+              </div>
+            </div>
+
+            <!-- Fact Text -->
+            <p class="text-gray-700 text-base leading-relaxed mb-6 group-hover:text-gray-800 transition-colors font-inter">
+              {{ fact.text }}
+            </p>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-between">
+              <!-- Vote Count -->
+              <div class="flex items-center text-gray-500">
+                <svg class="w-4 h-4 mr-1 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+                </svg>
+                <span class="text-sm font-medium font-inter">{{ fact.votes }}</span>
+                <span class="text-xs ml-1 font-inter">votos</span>
+              </div>
+
+              <!-- Vote Button -->
+              <button
+                @click="factsStore.voteFact(fact.id)"
+                :disabled="factsStore.votingId === fact.id"
+                class="group/btn relative overflow-hidden bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-4 py-2 rounded-full font-medium transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl font-inter"
+                :aria-label="`Votar por curiosidad ${index + 1}`"
+              >
+                <div class="flex items-center space-x-2">
+                  <span 
+                    v-if="factsStore.votingId === fact.id"
+                    class="inline-block animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                  ></span>
+                  <span v-else class="text-lg">👍</span>
+                  <span class="text-sm">
+                    {{ factsStore.votingId === fact.id ? 'Votando...' : 'Votar' }}
+                  </span>
+                </div>
+                
+                <!-- Button shine effect -->
+                <div class="absolute inset-0 -top-1 -left-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover/btn:opacity-20 transform -skew-x-12 group-hover/btn:animate-pulse"></div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Hover Effect Border -->
+          <div class="absolute inset-0 border-2 border-transparent group-hover:border-green-200 rounded-2xl transition-colors duration-300 pointer-events-none"></div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div 
+        v-if="!factsStore.isLoading && factsStore.facts.length === 0"
+        class="text-center py-16"
+      >
+        <div class="text-6xl mb-4">😢</div>
+        <h3 class="text-2xl font-bold text-gray-700 mb-2 font-inter">No hay curiosidades disponibles</h3>
+        <p class="text-gray-500 font-inter">¡Vuelve pronto para descubrir datos fascinantes!</p>
+      </div>
+
+      <!-- Stats Footer -->
+      <div 
+        v-if="!factsStore.isLoading && factsStore.facts.length > 0"
+        class="mt-16 text-center"
+      >
+        <div class="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto border-t-4 border-green-500">
+          <h3 class="text-lg font-bold text-gray-800 mb-2 font-inter">📊 Estadísticas</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4">
+              <div class="text-2xl font-bold text-green-600 font-inter">{{ factsStore.facts.length }}</div>
+              <div class="text-sm text-gray-600 font-inter">Curiosidades</div>
+            </div>
+            <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4">
+              <div class="text-2xl font-bold text-emerald-600 font-inter">
+                {{ factsStore.facts.reduce((sum, fact) => sum + fact.votes, 0) }}
+              </div>
+              <div class="text-sm text-gray-600 font-inter">Votos totales</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -38,3 +144,26 @@ onMounted(() => {
   factsStore.fetchFacts()
 });
 </script>
+
+<style scoped>
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.grid > div {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+/* Custom shadow for enhanced depth */
+.hover\:shadow-3xl:hover {
+  box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+}
+</style>

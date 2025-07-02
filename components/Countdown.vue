@@ -1,62 +1,93 @@
 <template>
-  <div class="text-center my-8">
-    <h2 class="text-2xl mb-2">¡Faltan...</h2>
-    <div class="text-4xl font-bold">{{ countdown }}</div>
-    <p class="mt-2">para el inicio de los Carnavales Correntinos 2026</p>
-    <div class="flex flex-col md:flex-row gap-4">
-      <a
-        href="https://www.facebook.com/carnavalcorrentino"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-      >
-        Facebook
-      </a>
-      <a
-        href="https://www.instagram.com/carnavalcorrentino/"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 transition-colors"
-      >
-        Instagram
-      </a>
-      <a
-        href="https://www.youtube.com/c/CarnavalCorrentino"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
-      >
-        YouTube
-      </a>    
-      <a
-        href="https://www.carnavalcorrentino.com.ar"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
-      >
-        Sitio Oficial
-      </a>
+  <div class="max-w-4xl mx-auto px-6 py-12">
+    <!-- Hero Title Section -->
+    <div class="text-center mb-16">
+      <h1 class="text-5xl md:text-7xl text-gray-800 leading-tight mb-4 font-inter font-extralight">
+        Carnavales Correntinos
+        <span class="block text-secondary bg-gradient-to-r from-secondary to-accent bg-clip-text">
+          2026
+        </span>
+      </h1>
+      <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+        La fiesta más colorida de Argentina está por comenzar
+      </p>
+    </div>
+
+    <!-- Countdown Display -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-12">
+      <div class="text-center">
+        <div class="text-6xl md:text-8xl font-bold text-primary mb-2 font-inter animate-pulse">
+          {{ days }}
+        </div>
+        <div class="text-base md:text-lg font-semibold text-primary uppercase tracking-wider">
+          Días
+        </div>
+      </div>
+      
+      <div class="text-center">
+        <div class="text-6xl md:text-8xl font-bold text-primary mb-2 font-inter animate-pulse">
+          {{ hours }}
+        </div>
+        <div class="text-base md:text-lg font-semibold text-primary uppercase tracking-wider">
+          Horas
+        </div>
+      </div>
+      
+      <div class="text-center">
+        <div class="text-6xl md:text-8xl font-bold text-primary mb-2 font-inter animate-pulse">
+          {{ minutes }}
+        </div>
+        <div class="text-base md:text-lg font-semibold text-primary uppercase tracking-wider">
+          Minutos
+        </div>
+      </div>
+      
+      <div class="text-center">
+        <div class="text-6xl md:text-8xl font-bold text-primary mb-2 font-inter animate-pulse">
+          {{ seconds }}
+        </div>
+        <div class="text-base md:text-lg font-semibold text-primary uppercase tracking-wider">
+          Segundos
+        </div>
+      </div>
+    </div>
+
+    <!-- Date Info -->
+    <div class="text-center">
+      <p class="inline-flex items-center px-6 py-3 bg-primary-light text-primary rounded-full font-semibold text-lg border border-primary text-green-600 hover:shadow-md transition-all">
+        31 de Enero • 22:00 hs
+      </p>
     </div>
   </div>
 </template>
+
 <script setup>
 import { useIntervalFn } from '@vueuse/core'
 import { ref } from 'vue'
 
 const targetDate = new Date('2026-01-31T22:00:00-03:00')
-const countdown = ref('')
+
+const days = ref(0)
+const hours = ref(0)
+const minutes = ref(0)
+const seconds = ref(0)
+
 function updateCountdown() {
   const now = new Date()
-  let diff = Math.max(0, targetDate - now)
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  diff -= days * 1000 * 60 * 60 * 24
-  const hours = Math.floor(diff / (1000 * 60 * 60))
-  diff -= hours * 1000 * 60 * 60
-  const minutes = Math.floor(diff / (1000 * 60))
-  diff -= minutes * 1000 * 60
-  const seconds = Math.floor(diff / 1000)
-  countdown.value = `${days}d ${hours}h ${minutes}m ${seconds}s`
+  let diff = Math.max(0, targetDate.getTime() - now.getTime())
+
+  days.value = Math.floor(diff / (1000 * 60 * 60 * 24))
+  diff -= days.value * 1000 * 60 * 60 * 24
+
+  hours.value = Math.floor(diff / (1000 * 60 * 60))
+  diff -= hours.value * 1000 * 60 * 60
+
+  minutes.value = Math.floor(diff / (1000 * 60))
+  diff -= minutes.value * 1000 * 60
+
+  seconds.value = Math.floor(diff / 1000)
 }
+
 useIntervalFn(updateCountdown, 1000)
 updateCountdown()
 </script>

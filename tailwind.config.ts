@@ -12,10 +12,15 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['Poppins', 'Arial', 'sans-serif'],
+        inter: ['Inter', 'Arial', 'sans-serif'],
       },
-      // Put other custom colors/fonts here if you want!
+      colors: {
+        primary: '#7b34dd',
+        secondary: '#f02e65',
+        accent: '#ffc107',
+        neutral: '#f4f4f4',
+      },
     },
-    // Example breakpoints (customize if you want)
     screens: {
       'xs': '375px',
       'sm': '640px',

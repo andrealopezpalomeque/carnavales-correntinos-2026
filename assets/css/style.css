@@ -2,6 +2,11 @@ html {
   font-size: 14px;
 }
 body {
-  font-family: 'Poppins', Arial, sans-serif;
+  font-family: 'Poppins', 'Inter', Arial, sans-serif;
   background-color: #f4f4f4;
+  cursor: default;
+}
+
+.font-inter {
+  font-family: 'Inter', Arial, sans-serif !important;
 }

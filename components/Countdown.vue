@@ -4,7 +4,7 @@
     <div class="text-center mb-16">
       <h1 class="text-5xl md:text-7xl text-gray-800 leading-tight mb-4 font-inter font-extralight">
         Carnavales Correntinos
-        <span class="block text-secondary bg-gradient-to-r from-secondary to-accent bg-clip-text">
+        <span class="block text-green-600 bg-gradient-to-r from-green-600 to-green-400 bg-clip-text">
           2026
         </span>
       </h1>
@@ -16,37 +16,37 @@
     <!-- Countdown Display -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-lg mb-12">
       <div class="text-center">
-        <div class="text-6xl md:text-8xl font-bold text-primary mb-2 font-inter animate-pulse">
+        <div class="text-6xl md:text-8xl font-bold text-green-600 mb-2 font-inter animate-pulse">
           {{ days }}
         </div>
-        <div class="text-base md:text-lg font-semibold text-primary uppercase tracking-wider">
+        <div class="text-base md:text-lg font-semibold text-green-600 uppercase tracking-wider">
           Días
         </div>
       </div>
       
       <div class="text-center">
-        <div class="text-6xl md:text-8xl font-bold text-primary mb-2 font-inter animate-pulse">
+        <div class="text-6xl md:text-8xl font-bold text-green-600 mb-2 font-inter animate-pulse">
           {{ hours }}
         </div>
-        <div class="text-base md:text-lg font-semibold text-primary uppercase tracking-wider">
+        <div class="text-base md:text-lg font-semibold text-green-600 uppercase tracking-wider">
           Horas
         </div>
       </div>
       
       <div class="text-center">
-        <div class="text-6xl md:text-8xl font-bold text-primary mb-2 font-inter animate-pulse">
+        <div class="text-6xl md:text-8xl font-bold text-green-600 mb-2 font-inter animate-pulse">
           {{ minutes }}
         </div>
-        <div class="text-base md:text-lg font-semibold text-primary uppercase tracking-wider">
+        <div class="text-base md:text-lg font-semibold text-green-600 uppercase tracking-wider">
           Minutos
         </div>
       </div>
       
       <div class="text-center">
-        <div class="text-6xl md:text-8xl font-bold text-primary mb-2 font-inter animate-pulse">
+        <div class="text-6xl md:text-8xl font-bold text-green-600 mb-2 font-inter animate-pulse">
           {{ seconds }}
         </div>
-        <div class="text-base md:text-lg font-semibold text-primary uppercase tracking-wider">
+        <div class="text-base md:text-lg font-semibold text-green-600 uppercase tracking-wider">
           Segundos
         </div>
       </div>
@@ -54,7 +54,7 @@
 
     <!-- Date Info -->
     <div class="text-center">
-      <p class="inline-flex items-center px-6 py-3 bg-primary-light text-primary rounded-full font-semibold text-lg border border-primary text-green-600 hover:shadow-md transition-all">
+      <p class="inline-flex items-center px-6 py-3 bg-green-50 text-green-700 rounded-full font-semibold text-lg border border-green-200 hover:shadow-md transition-all">
         31 de Enero • 22:00 hs
       </p>
     </div>

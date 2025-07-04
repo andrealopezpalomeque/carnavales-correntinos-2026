@@ -57,10 +57,6 @@
               <div class="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-2xl border-4 border-white group-hover:shadow-green-500/30 transition-all duration-500 group-hover:scale-110">
                 <span class="text-4xl animate-bounce">{{ getRandomEmoji(index) }}</span>
               </div>
-              <!-- Speaking indicator -->
-              <div class="absolute -bottom-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                <span class="text-xs">💬</span>
-              </div>
             </div>
           </div>
 

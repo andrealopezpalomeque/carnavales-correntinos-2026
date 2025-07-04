@@ -1,110 +1,141 @@
 <template>
-  <section id="related-news" class="section-standard bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-    <div class="container-standard">
-      <!-- Header -->
-      <div class="text-center mb-12">
-        <h2 class="text-4xl font-bold text-gray-800 mb-4">
-          📰 Noticias Relacionadas
+  <section id="related-news" class="section-standard bg-gradient-to-br from-gray-50 to-white min-h-screen relative overflow-hidden">
+    <!-- Animated Background Pattern -->
+    <div class="absolute inset-0 opacity-5">
+      <div class="absolute inset-0 bg-gradient-to-br from-gray-100 via-gray-50 to-white"></div>
+      <div class="absolute top-0 left-1/4 w-96 h-96 bg-green-200 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+      <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"></div>
+    </div>
+
+    <div class="container-standard relative z-10">
+      <!-- Header with modern newspaper style -->
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center mb-6">
+          <div class="h-px bg-gradient-to-r from-transparent via-green-400 to-transparent flex-1"></div>
+          <span class="px-6 text-6xl">📰</span>
+          <div class="h-px bg-gradient-to-r from-transparent via-green-400 to-transparent flex-1"></div>
+        </div>
+        <h2 class="text-5xl font-bold bg-gradient-to-r from-green-400 via-emerald-500 to-green-700 bg-clip-text text-transparent mb-4">
+          Noticias Relacionadas
         </h2>
-        <p class="text-gray-600 text-lg max-w-2xl mx-auto">
-          Para mantenerse informados y calmar la ansiedad.
+        <p class="text-gray-600 text-xl max-w-3xl mx-auto leading-relaxed">
+          Para mantenerse informados y calmar la ansiedad antes del gran evento.
         </p>
       </div>
 
       <!-- Loading State -->
-      <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-if="isLoading" class="space-y-8">
         <div 
-          v-for="n in 6" 
+          v-for="n in 3" 
           :key="n"
-          class="bg-white rounded-2xl shadow-lg p-6 animate-pulse"
+          class="bg-white border border-gray-200 rounded-xl p-8 animate-pulse shadow-lg"
         >
-          <div class="h-4 bg-gray-200 rounded mb-4"></div>
-          <div class="h-4 bg-gray-200 rounded mb-4 w-3/4"></div>
-          <div class="h-4 bg-gray-200 rounded w-1/2"></div>
-          <div class="flex justify-between items-center mt-6">
-            <div class="h-6 bg-gray-200 rounded w-20"></div>
-            <div class="h-8 bg-gray-200 rounded w-24"></div>
+          <div class="flex flex-col lg:flex-row gap-6">
+            <div class="lg:w-1/3">
+              <div class="h-32 bg-gray-200 rounded-lg mb-4"></div>
+            </div>
+            <div class="lg:w-2/3">
+              <div class="h-6 bg-gray-200 rounded mb-3"></div>
+              <div class="h-4 bg-gray-200 rounded mb-2 w-3/4"></div>
+              <div class="h-4 bg-gray-200 rounded mb-4 w-1/2"></div>
+              <div class="h-8 bg-gray-200 rounded w-32"></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- News Grid -->
-      <div 
-        v-else
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md"
-      >
+      <!-- News List - Magazine Style -->
+      <div v-else class="space-y-8">
         <article
           v-for="(news, index) in newsItems"
           :key="news.id"
-          class="card-feature group overflow-hidden border border-gray-100"
-          :style="{ animationDelay: `${index * 100}ms` }"
+          class="group bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl overflow-hidden hover:bg-white transition-all duration-500 hover:border-green-400/50 hover:shadow-2xl hover:shadow-green-500/10 shadow-lg"
+          :style="{ animationDelay: `${index * 200}ms` }"
         >
-          <!-- Card Header -->
-          <div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2"></div>
-          
-          <!-- Card Content -->
-          <div class="p-6">
-            <!-- News Source -->
-            <div class="flex items-center mb-4">
-              <div class="w-10 h-10 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mr-3">
-                <span class="text-xl">📺</span>
-              </div>
-              <div class="text-sm text-gray-500 font-medium">
-                {{ news.source }}
-              </div>
+          <div class="flex flex-col lg:flex-row">
+            <!-- News Image -->
+            <div class="lg:w-1/3 h-64 lg:h-auto relative overflow-hidden">
+              <img
+                :src="news.image"
+                :alt="news.title"
+                class="w-full h-full object-cover"
+                loading="lazy"
+              />
+              <!-- Dark overlay for text readability -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+              <!-- Animated overlay on hover -->
+              <div class="absolute inset-0 bg-green-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             </div>
 
-            <!-- News Title -->
-            <h3 class="text-lg font-bold text-gray-800 mb-3 line-clamp-2 group-hover:text-blue-700 transition-colors">
-              {{ news.title }}
-            </h3>
+            <!-- News Content -->
+            <div class="lg:w-2/3 p-8">
+              <!-- News Meta -->
+              <div class="flex items-center gap-4 mb-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
+                  {{ news.source }}
+                </span>
+                <div class="flex items-center text-gray-500 text-sm">
+                  <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                  </svg>
+                  {{ formatDate(news.date) }}
+                </div>
+              </div>
 
-            <!-- News Description -->
-            <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
-              {{ news.description }}
-            </p>
+              <!-- News Title -->
+              <h3 class="text-2xl font-bold text-gray-800 mb-4 leading-tight group-hover:text-green-700 transition-colors duration-300">
+                {{ news.title }}
+              </h3>
 
-            <!-- News Date -->
-            <div class="flex items-center text-gray-500 text-xs mb-6">
-              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
-              </svg>
-              <span class="">{{ formatDate(news.date) }}</span>
-            </div>
+              <!-- News Description -->
+              <p class="text-gray-600 leading-relaxed mb-6 text-base">
+                {{ news.description }}
+              </p>
 
-            <!-- Read More Button -->
-            <a
-              :href="news.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="btn-secondary group/btn relative overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-full w-full text-center inline-block"
-              :aria-label="`Leer más sobre ${news.title}`"
-            >
-              <div class="flex items-center justify-center space-x-2">
-                <span class="text-sm">Leer más</span>
-                <svg class="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <!-- Read More Button -->
+              <a
+                :href="news.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-medium rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-green-500/25 hover:scale-105"
+                :aria-label="`Leer más sobre ${news.title}`"
+              >
+                <span>Leer artículo completo</span>
+                <svg class="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
-              </div>
-              
-              <!-- Button shine effect -->
-              <div class="absolute inset-0 -top-1 -left-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover/btn:opacity-20 transform -skew-x-12 group-hover/btn:animate-pulse"></div>
-            </a>
+              </a>
+            </div>
           </div>
-
-          <!-- Hover Effect Border -->
-          <div class="absolute inset-0 border-2 border-transparent group-hover:border-blue-200 rounded-2xl transition-colors duration-300 pointer-events-none"></div>
         </article>
       </div>
 
       <!-- Empty State -->
       <div 
         v-if="!isLoading && newsItems.length === 0"
-        class="text-center py-16"
+        class="text-center py-24"
       >
-        <div class="text-6xl mb-4">📰</div>
-        <h3 class="text-2xl font-bold text-gray-700 mb-2">No hay noticias disponibles</h3>
-        <p class="text-gray-500">¡Vuelve pronto para leer las últimas noticias!</p>
+        <div class="text-8xl mb-6 opacity-30">📰</div>
+        <h3 class="text-3xl font-bold text-gray-700 mb-4">No hay noticias disponibles</h3>
+        <p class="text-gray-500 text-lg">¡Vuelve pronto para leer las últimas noticias!</p>
+      </div>
+
+      <!-- Bottom Stats -->
+      <div 
+        v-if="!isLoading && newsItems.length > 0"
+        class="mt-20 text-center"
+      >
+        <div class="inline-flex items-center gap-8 bg-white/70 backdrop-blur-sm border border-gray-200/50 rounded-2xl px-8 py-6 shadow-lg">
+          <div class="text-center">
+            <div class="text-3xl font-bold text-green-600 mb-1">{{ newsItems.length }}</div>
+            <div class="text-sm text-gray-600">Noticias</div>
+          </div>
+          <div class="w-px h-12 bg-gray-200"></div>
+          <div class="text-center">
+            <div class="text-3xl font-bold text-emerald-600 mb-1">{{ getTotalSources() }}</div>
+            <div class="text-sm text-gray-600">Fuentes</div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -133,7 +164,8 @@ const sampleNews = [
     description:"En conferencia de prensa, con el Corsódromo \"Nolo Alías\" como escenario, este sábado la ministra de Turismo, Alejandra Eliciri en representación del Gobierno provincial encabezó el lanzamiento del Carnaval Provincial 2026 a realizarse durante 10 noches del 31 de enero al 28 de febrero, con una noche de Duelo de Batería, y tres fechas para los shows de Comparsas.",
     source:"Radio Dos",
     date: new Date(2025, 5, 22),
-    url:"https://www.radiodos.com.ar/191790-anunciaron-las-fechas-del-carnaval-provincial-de-corrientes-2026"
+    url:"https://www.radiodos.com.ar/191790-anunciaron-las-fechas-del-carnaval-provincial-de-corrientes-2026",
+    image:"/images/news1.png"
   },
   {
     id: 2,
@@ -141,15 +173,17 @@ const sampleNews = [
     description:"Con el Corsódromo \"Nolo Alías\" como telón de fondo y la energía aún latente del workshop con los mestres del Carnaval de Río, el sábado se lanzó oficialmente el Carnaval Provincial 2026. La ministra de Turismo de Corrientes, Alejandra Eliciri, encabezó la conferencia en la que se confirmaron las fechas clave del evento que volverá a encender la temporada de verano en la Capital Nacional del Carnaval.",
     date: new Date(2025, 5, 22),
     source:"Corrientes al Día",
-    url:"https://corrientesaldia.info/2025/06/22/corrientes-ya-palpita-el-carnaval-provincial-2026-seran-10-noches-a-puro-ritmo/"
+    url:"https://corrientesaldia.info/2025/06/22/corrientes-ya-palpita-el-carnaval-provincial-2026-seran-10-noches-a-puro-ritmo/",
+    image:"/images/news2.png"
   },
   {
     id: 3,
-    title:"Hoteles de Corrientes reportan reservas al 90% para Carnavales 2026",
+    title:"Samba Total encendió la primera luz del Carnaval 2026",
     description:"La agrupación musical se convirtió en la primera institución de los carnavales correntinos en anunciar la temática artística que representará en la próxima edición. \"It's Showtime\" fue el adelanto del homenaje que realizará a la cadena de espectáculos de México Coco Bongo.",
-    source:"Norte",
+    source:"Diario Época",
     date: new Date(2025, 3, 28),
-    url:"https://www.diarioepoca.com/1351054-samba-total-encendio-la-primera-luz-del-carnaval-2026"
+    url:"https://www.diarioepoca.com/1351054-samba-total-encendio-la-primera-luz-del-carnaval-2026",
+    image:"/images/news3.png"
   }
 ]
 
@@ -194,7 +228,7 @@ onMounted(() => {
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(50px);
   }
   to {
     opacity: 1;
@@ -202,37 +236,71 @@ onMounted(() => {
   }
 }
 
-.grid > article {
-  animation: fadeInUp 0.6s ease-out forwards;
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.space-y-8 > article {
+  animation: slideInLeft 0.8s ease-out forwards;
   opacity: 0;
 }
 
-/* Text clamp utilities */
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+/* Delayed animation for background elements */
+.animation-delay-2000 {
+  animation-delay: 2s;
 }
 
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+/* Floating animation for background elements */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
-/* Custom hover effects */
-.hover\:shadow-3xl:hover {
-  box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+/* Glass morphism effect enhancement */
+.backdrop-blur-sm {
+  backdrop-filter: blur(8px);
 }
 
-/* External link icon animation */
-a[target="_blank"] svg {
-  transition: transform 0.2s ease;
+/* Custom gradient text */
+.bg-clip-text {
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
-a[target="_blank"]:hover svg {
-  transform: translateX(2px) translateY(-2px);
+/* Enhanced hover states */
+article:hover {
+  transform: translateY(-4px);
+}
+
+/* Button hover enhancements */
+a[target="_blank"]:hover {
+  transform: scale(1.05);
+}
+
+/* Responsive image placeholders */
+@media (max-width: 1024px) {
+  .lg\:w-1\/3 {
+    height: 200px;
+  }
+}
+
+/* Enhanced text readability on dark backgrounds */
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 </style>

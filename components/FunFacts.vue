@@ -1,12 +1,17 @@
 <template>
   <section id="fun-facts" class="section-standard bg-gradient-to-br from-green-50 to-emerald-50 min-h-screen">
     <div class="container-standard">
-      <!-- Header -->
-      <div class="text-center mb-12">
-        <h2 class="text-4xl font-bold text-gray-800 mb-4">
-          🎭 Curiosidades del Carnaval
+      <!-- Header with modern style -->
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center mb-6">
+          <div class="h-px bg-gradient-to-r from-transparent via-green-400 to-transparent flex-1"></div>
+          <span class="px-6 text-6xl">🎭</span>
+          <div class="h-px bg-gradient-to-r from-transparent via-green-400 to-transparent flex-1"></div>
+        </div>
+        <h2 class="text-5xl font-bold bg-gradient-to-r from-green-600 via-emerald-500 to-green-700 bg-clip-text text-transparent mb-4">
+          Curiosidades del Carnaval
         </h2>
-        <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+        <p class="text-gray-600 text-xl max-w-3xl mx-auto leading-relaxed">
           Descubre datos fascinantes sobre la celebración más esperada del año.
         </p>
       </div>
@@ -47,7 +52,7 @@
             <!-- Fact Icon -->
             <div class="flex items-center mb-4">
               <div class="w-10 h-10 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full flex items-center justify-center mr-3">
-                <span class="text-xl">🎪</span>
+                <span class="text-xl">😮</span>
               </div>
               <div class="text-sm text-gray-500 font-medium">
                 Curiosidad #{{ index + 1 }}
@@ -109,24 +114,22 @@
         <p class="text-gray-500">¡Vuelve pronto para descubrir datos fascinantes!</p>
       </div>
 
-      <!-- Stats Footer -->
+      <!-- Bottom Stats -->
       <div 
         v-if="!factsStore.isLoading && factsStore.facts.length > 0"
-        class="mt-16 text-center"
+        class="mt-20 text-center"
       >
-        <div class="card-feature max-w-md mx-auto border-t-4 border-green-500">
-          <h3 class="text-lg font-bold text-gray-800 mb-2">📊 Estadísticas</h3>
-          <div class="grid grid-cols-2 gap-sm">
-            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4">
-              <div class="text-2xl font-bold text-green-600">{{ factsStore.facts.length }}</div>
-              <div class="text-sm text-gray-600">Curiosidades</div>
+        <div class="inline-flex items-center gap-8 bg-white/70 backdrop-blur-sm border border-green-200/50 rounded-2xl px-8 py-6 shadow-lg">
+          <div class="text-center">
+            <div class="text-3xl font-bold text-green-600 mb-1">{{ factsStore.facts.length }}</div>
+            <div class="text-sm text-gray-600">Curiosidades</div>
+          </div>
+          <div class="w-px h-12 bg-green-200"></div>
+          <div class="text-center">
+            <div class="text-3xl font-bold text-emerald-600 mb-1">
+              {{ factsStore.facts.reduce((sum, fact) => sum + fact.votes, 0) }}
             </div>
-            <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4">
-              <div class="text-2xl font-bold text-emerald-600">
-                {{ factsStore.facts.reduce((sum, fact) => sum + fact.votes, 0) }}
-              </div>
-              <div class="text-sm text-gray-600">Votos totales</div>
-            </div>
+            <div class="text-sm text-gray-600">Votos totales</div>
           </div>
         </div>
       </div>
@@ -160,6 +163,12 @@ onMounted(() => {
 .grid > div {
   animation: fadeInUp 0.6s ease-out forwards;
   opacity: 0;
+}
+
+/* Custom gradient text */
+.bg-clip-text {
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 /* Custom shadow for enhanced depth */

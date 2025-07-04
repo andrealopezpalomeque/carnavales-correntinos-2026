@@ -14,6 +14,7 @@
           :src="image.src"
           :alt="image.alt"
           class="w-full h-full object-cover"
+          loading="lazy"
         />
         <!-- Overlay with text -->
         <div class="absolute inset-0 bg-opacity-30 flex items-baseline-last pb-10 justify-center">

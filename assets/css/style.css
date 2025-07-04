@@ -10,3 +10,192 @@ body {
 .font-inter {
   font-family: 'Inter', Arial, sans-serif !important;
 }
+
+/* Standardized Layout System */
+.container-standard {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .container-standard {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-standard {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.container-content {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .container-content {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-content {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.container-prose {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .container-prose {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Section Spacing System */
+.section-standard {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.section-hero {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+.section-compact {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+/* Button System */
+.btn-primary {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  transform: scale(1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.btn-secondary {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.btn-secondary:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-icon {
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+/* Card System */
+.card-standard {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.card-standard:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.card-feature {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  transition: all 0.3s ease;
+  transform: translateY(0);
+}
+
+.card-feature:hover {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: translateY(-0.5rem);
+}
+
+.card-compact {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.card-compact:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive Gap System */
+.gap-sm {
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .gap-sm {
+    gap: 1.5rem;
+  }
+}
+
+.gap-md {
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .gap-md {
+    gap: 2rem;
+  }
+}
+
+.gap-lg {
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .gap-lg {
+    gap: 3rem;
+  }
+}
+
+/* Flex Spacing System */
+.space-sm > * + * {
+  margin-left: 0.5rem;
+}
+
+.space-md > * + * {
+  margin-left: 1rem;
+}
+
+.space-lg > * + * {
+  margin-left: 2rem;
+}

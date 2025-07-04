@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-4xl mx-auto px-6 py-12">
+  <div class="container-content section-hero">
     <!-- Hero Title Section -->
     <div class="text-center mb-16">
       <h1 class="text-5xl md:text-7xl text-gray-800 leading-tight mb-4 font-inter font-extralight">
@@ -14,7 +14,7 @@
     </div>
 
     <!-- Countdown Display -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-12">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-lg mb-12">
       <div class="text-center">
         <div class="text-6xl md:text-8xl font-bold text-primary mb-2 font-inter animate-pulse">
           {{ days }}

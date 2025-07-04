@@ -1,6 +1,6 @@
 <template>
   <nav class="bg-white shadow-md border-b border-gray-100 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="container-standard">
       <div class="flex justify-between items-center h-16">
         <!-- Logo Section -->
         <div class="flex items-center">
@@ -21,7 +21,7 @@
 
         <!-- CTA Button -->
         <div class="hidden md:block">
-          <button class="bg-green-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-green-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+          <button class="btn-primary bg-green-600 text-white hover:bg-green-700 text-sm">
             Iniciar Sesión
           </button>
         </div>
@@ -48,7 +48,7 @@
 
         <!-- Mobile CTA Button -->
         <div class="pt-4 pb-2">
-          <button @click="closeMobileMenu" class="w-full bg-green-600 text-white px-6 py-3 rounded-lg text-base font-medium hover:bg-green-700 transition-all duration-200 shadow-md">
+          <button @click="closeMobileMenu" class="btn-primary w-full bg-green-600 text-white hover:bg-green-700 text-base">
             Iniciar Sesión
           </button>
         </div>

@@ -4,8 +4,7 @@
     <section id="countdown" class="section-compact min-h-[60vh] flex flex-col items-center justify-center">
       <Countdown />
     </section>
-    <!-- Add placeholder for Photos and FunFacts -->
-    <section id="photos" class="section-compact min-h-[30vh] flex flex-col items-center justify-center">
+    <section id="photos" class="min-h-[30vh] flex flex-col items-center justify-center">
       <Gallery/>
     </section>
     <section id="fun-facts" class="min-h-[30vh] flex flex-col items-center justify-center">

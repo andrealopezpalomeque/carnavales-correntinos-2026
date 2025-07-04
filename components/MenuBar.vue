@@ -72,5 +72,6 @@ const sections = [
   { id: 'countdown', name: 'Cuenta Regresiva' },
   { id: 'photos', name: 'Fotos' },
   { id: 'fun-facts', name: 'Curiosidades' },
+  { id: 'related-news', name: 'Noticias Relacionadas' },
 ]
 </script>

@@ -19,12 +19,6 @@ body {
   padding-right: 1.5rem;
 }
 
-@media (min-width: 640px) {
-  .container-standard {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-}
 
 @media (min-width: 1024px) {
   .container-standard {
@@ -40,12 +34,6 @@ body {
   padding-right: 1.5rem;
 }
 
-@media (min-width: 640px) {
-  .container-content {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-}
 
 @media (min-width: 1024px) {
   .container-content {
@@ -61,12 +49,6 @@ body {
   padding-right: 1.5rem;
 }
 
-@media (min-width: 640px) {
-  .container-prose {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-}
 
 /* Section Spacing System */
 .section-standard {
@@ -75,13 +57,13 @@ body {
 }
 
 .section-hero {
-  padding-top: 5rem;
-  padding-bottom: 5rem;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
 }
 
 .section-compact {
-  padding-top: 3rem;
-  padding-bottom: 3rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
 }
 
 /* Button System */

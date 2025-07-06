@@ -1,5 +1,6 @@
 <template>
-  <div class="relative w-full h-96 md:h-[500px] lg:h-[600px] overflow-hidden bg-gray-900">
+  <div class="container-standard pb-6">
+    <div class="relative w-full h-96 md:h-[500px] lg:h-[600px] overflow-hidden bg-gray-900 rounded-xl shadow-lg">
     <!-- Carousel Images -->
     <div 
       class="flex transition-transform duration-500 ease-in-out h-full"
@@ -64,6 +65,7 @@
       <Pause v-if="isPlaying" class="w-5 h-5" />
       <Play v-else class="w-5 h-5" />
     </button>
+    </div>
   </div>
 </template>
 

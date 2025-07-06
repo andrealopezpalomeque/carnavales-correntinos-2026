@@ -40,7 +40,7 @@
 
     <!-- Mobile menu -->
     <div v-show="mobileMenuOpen" class="md:hidden bg-white border-t border-gray-100">
-      <div class="px-4 pt-2 pb-3 space-y-1">
+      <div class="container-standard pt-2 pb-3 space-y-1">
         <!-- Mobile Navigation Links -->
         <a v-for="section in sections" :key="section.id" :href="`#${section.id}`" @click="closeMobileMenu" class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-4 py-3 rounded-lg text-base font-medium transition-all duration-200">
           {{ section.name }}

@@ -36,7 +36,7 @@
       <!-- Facts Layout - Comic Bubble Style -->
       <div 
         v-else
-        class="max-w-6xl mx-auto space-y-8"
+        class="space-y-8"
       >
         <div
           v-for="(fact, index) in factsStore.facts"
@@ -69,7 +69,7 @@
               <!-- Background Pattern -->
               <div class="absolute inset-0 opacity-5">
                 <div class="absolute top-4 right-4 text-6xl text-green-500 rotate-12">🎭</div>
-                <div class="absolute bottom-4 left-4 text-4xl text-emerald-400 -rotate-12">🎪</div>
+                <div class="absolute bottom-4 left-4 text-6xl text-emerald-400 -rotate-12">🎪</div>
               </div>
               
               <!-- Content -->

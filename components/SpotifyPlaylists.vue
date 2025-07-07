@@ -205,7 +205,7 @@ const samplePlaylists = [
   },
   {
     id: 4,
-    name: "Sapucai Night",
+    name: "Sapucay Night",
     description: "Ritmos para bailar toda la noche en el corsódromo",
     cover: "/images/playlist4.jpg",
     tracks: 40,

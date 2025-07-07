@@ -385,11 +385,16 @@ export const useAuthEnhanced = () => {
       authState.isLoading = true
       authState.error = null
 
-      // Log logout activity before signing out
+      // Log logout activity before signing out (with error handling)
       if (authState.authUser) {
-        await dbService.logUserAction(authState.authUser.uid, 'logout', {
-          logoutMethod: 'manual'
-        })
+        try {
+          await dbService.logUserAction(authState.authUser.uid, 'logout', {
+            logoutMethod: 'manual'
+          })
+        } catch (logError) {
+          console.warn('Could not log logout activity:', logError)
+          // Continue with logout even if logging fails
+        }
       }
 
       await signOut(auth)

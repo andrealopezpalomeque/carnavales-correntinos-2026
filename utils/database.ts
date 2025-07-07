@@ -259,20 +259,25 @@ export class DatabaseService {
 
   // Analytics and logging
   async logUserAction(userId: string, action: string, metadata?: any): Promise<void> {
-    const logData = {
-      userId,
-      action,
-      metadata: metadata || {},
-      timestamp: serverTimestamp(),
-      userAgent: navigator.userAgent,
-      url: window.location.href
+    try {
+      const logData = {
+        userId,
+        action,
+        metadata: metadata || {},
+        timestamp: serverTimestamp(),
+        userAgent: navigator.userAgent,
+        url: window.location.href
+      }
+      
+      const db = this.ensureFirestore()
+      const logsRef = collection(db, 'logs')
+      const docRef = doc(logsRef)
+      
+      await setDoc(docRef, logData)
+    } catch (error) {
+      // Log to console but don't throw error to avoid breaking the main flow
+      console.warn('Failed to log user action:', { userId, action, error })
     }
-    
-    const db = this.ensureFirestore()
-    const logsRef = collection(db, 'logs')
-    const docRef = doc(logsRef)
-    
-    await setDoc(docRef, logData)
   }
 
   // Batch operations

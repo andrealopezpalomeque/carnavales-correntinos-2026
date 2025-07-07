@@ -152,7 +152,11 @@ service cloud.firestore {
     }
     
     match /logs/{document} {
+      // Admins can read and write all logs
       allow read, write: if isAdmin();
+      // Authenticated users can create their own activity logs
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
     }
     
     // Fallback rule - deny everything else

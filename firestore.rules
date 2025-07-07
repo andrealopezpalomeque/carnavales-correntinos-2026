@@ -1,0 +1,163 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    function isModerator() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'moderator'];
+    }
+    
+    function isValidUserData(data) {
+      return data.keys().hasAll(['uid', 'email', 'displayName', 'role', 'isActive', 'createdAt', 'updatedAt']) &&
+             data.uid is string &&
+             data.email is string &&
+             data.displayName is string &&
+             data.role in ['admin', 'moderator', 'user'] &&
+             data.isActive is bool &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp;
+    }
+    
+    function isValidUserUpdate(data) {
+      // Fields that can be updated by user
+      let allowedFields = ['displayName', 'firstName', 'lastName', 'bio', 'preferences', 'photoURL', 'updatedAt', 'lastLoginAt'];
+      
+      // Check if only allowed fields are being updated
+      return data.diff(resource.data).affectedKeys().hasOnly(allowedFields);
+    }
+    
+    function isValidPreferences(preferences) {
+      return preferences.keys().hasAll(['theme', 'language', 'notifications', 'privacy']) &&
+             preferences.theme in ['light', 'dark', 'system'] &&
+             preferences.language in ['es', 'en'] &&
+             preferences.notifications.keys().hasAll(['email', 'push', 'marketing']) &&
+             preferences.privacy.keys().hasAll(['showEmail', 'showProfile']);
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Read: User can read their own profile, admins can read all, public profiles can be read by authenticated users
+      allow read: if isOwner(userId) || 
+                     isAdmin() || 
+                     (isAuthenticated() && resource.data.preferences.privacy.showProfile == true);
+      
+      // Create: Only the user themselves can create their profile
+      allow create: if isOwner(userId) && 
+                       isValidUserData(request.resource.data) &&
+                       request.resource.data.uid == userId &&
+                       request.resource.data.email == request.auth.token.email &&
+                       request.resource.data.role == 'user' &&
+                       request.resource.data.isActive == true;
+      
+      // Update: User can update their own profile with restrictions
+      allow update: if isOwner(userId) && 
+                       isValidUserUpdate(request.resource.data) &&
+                       // User cannot change their own role or active status
+                       request.resource.data.role == resource.data.role &&
+                       request.resource.data.isActive == resource.data.isActive &&
+                       // Validate preferences structure if being updated
+                       (!request.resource.data.keys().hasAny(['preferences']) || 
+                        isValidPreferences(request.resource.data.preferences));
+      
+      // Admin updates: Admins can update any user (including role and active status)
+      allow update: if isAdmin() && 
+                       isValidUserData(request.resource.data);
+      
+      // Delete: Only admins can delete users
+      allow delete: if isAdmin();
+      
+      // Subcollections for user-specific data
+      match /private/{document} {
+        // Private subcollection: only the user can access
+        allow read, write: if isOwner(userId);
+      }
+      
+      match /notifications/{notificationId} {
+        // User notifications: only the user can read/write
+        allow read, write: if isOwner(userId);
+      }
+    }
+    
+    // Admin collection - only admins can access
+    match /admin/{document} {
+      allow read, write: if isAdmin();
+    }
+    
+    // System settings - only admins can write, authenticated users can read
+    match /settings/{document} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Public content collections
+    match /facts/{factId} {
+      // Facts: authenticated users can read, moderators can write
+      allow read: if isAuthenticated();
+      allow write: if isModerator();
+    }
+    
+    match /news/{newsId} {
+      // News: authenticated users can read, moderators can write
+      allow read: if isAuthenticated();
+      allow write: if isModerator();
+    }
+    
+    match /playlists/{playlistId} {
+      // Playlists: authenticated users can read, moderators can write
+      allow read: if isAuthenticated();
+      allow write: if isModerator();
+    }
+    
+    match /photos/{photoId} {
+      // Photos: authenticated users can read, moderators can write
+      allow read: if isAuthenticated();
+      allow write: if isModerator();
+    }
+    
+    // User-generated content with ownership
+    match /posts/{postId} {
+      // Posts: authenticated users can read, users can create their own, owners can update/delete
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+                       request.resource.data.authorId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && 
+                              (resource.data.authorId == request.auth.uid || isModerator());
+    }
+    
+    match /comments/{commentId} {
+      // Comments: authenticated users can read, users can create their own, owners can update/delete
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+                       request.resource.data.authorId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && 
+                              (resource.data.authorId == request.auth.uid || isModerator());
+    }
+    
+    // Analytics and logs - only admins can access
+    match /analytics/{document} {
+      allow read, write: if isAdmin();
+    }
+    
+    match /logs/{document} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Fallback rule - deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

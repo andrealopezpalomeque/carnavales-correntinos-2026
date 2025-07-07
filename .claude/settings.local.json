@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "Bash(yarn dev)"
+    ],
+    "deny": []
+  }
+}

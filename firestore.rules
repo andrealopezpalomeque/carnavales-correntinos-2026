@@ -6,17 +6,25 @@ service cloud.firestore {
       return request.auth != null;
     }
     
+    function isEmailWhitelisted() {
+      return request.auth != null && 
+             request.auth.token.email in [
+               'andrealopezpalomeque@gmail.com',
+               'msofiarriiuca@gmail.com'
+             ];
+    }
+    
     function isOwner(userId) {
       return request.auth.uid == userId;
     }
     
     function isAdmin() {
-      return isAuthenticated() && 
+      return isEmailWhitelisted() && 
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     
     function isModerator() {
-      return isAuthenticated() && 
+      return isEmailWhitelisted() && 
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'moderator'];
     }
     
@@ -49,21 +57,23 @@ service cloud.firestore {
 
     // Users collection
     match /users/{userId} {
-      // Read: User can read their own profile, admins can read all, public profiles can be read by authenticated users
+      // Read: User can read their own profile, admins can read all, public profiles can be read by whitelisted users
       allow read: if isOwner(userId) || 
                      isAdmin() || 
-                     (isAuthenticated() && resource.data.preferences.privacy.showProfile == true);
+                     (isEmailWhitelisted() && resource.data.preferences.privacy.showProfile == true);
       
-      // Create: Only the user themselves can create their profile
-      allow create: if isOwner(userId) && 
+      // Create: Only whitelisted users can create their profile
+      allow create: if isEmailWhitelisted() &&
+                       isOwner(userId) && 
                        isValidUserData(request.resource.data) &&
                        request.resource.data.uid == userId &&
                        request.resource.data.email == request.auth.token.email &&
                        request.resource.data.role == 'user' &&
                        request.resource.data.isActive == true;
       
-      // Update: User can update their own profile with restrictions
-      allow update: if isOwner(userId) && 
+      // Update: Only whitelisted users can update their own profile with restrictions
+      allow update: if isEmailWhitelisted() &&
+                       isOwner(userId) && 
                        isValidUserUpdate(request.resource.data) &&
                        // User cannot change their own role or active status
                        request.resource.data.role == resource.data.role &&
@@ -110,10 +120,10 @@ service cloud.firestore {
     }
     
     match /funfacts/{factId} {
-      // Fun facts: public read access, moderators can write, authenticated users can vote
+      // Fun facts: public read access, moderators can write, whitelisted users can vote
       allow read: if true;
       allow write: if isModerator();
-      allow update: if isAuthenticated() && 
+      allow update: if isEmailWhitelisted() && 
                        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['votes']);
     }
     

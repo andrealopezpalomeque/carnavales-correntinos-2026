@@ -15,6 +15,7 @@ import {
   type Firestore 
 } from 'firebase/firestore'
 import { dbService } from '~/utils/database'
+import { isEmailWhitelisted, getWhitelistErrorMessage } from '~/utils/emailWhitelist'
 import type { 
   AuthUser, 
   UserProfile, 
@@ -267,11 +268,37 @@ export const useAuthEnhanced = () => {
       authState.isLoading = false
       
       if (firebaseUser) {
+        // Check email whitelist first
+        if (!isEmailWhitelisted(firebaseUser.email || '')) {
+          console.warn('Email not whitelisted:', firebaseUser.email)
+          
+          // Log unauthorized access attempt
+          await dbService.logUserAction(firebaseUser.uid, 'unauthorized_access_attempt', {
+            email: firebaseUser.email,
+            reason: 'email_not_whitelisted'
+          }).catch(() => {
+            // Ignore logging errors for unauthorized users
+          })
+          
+          // Sign out the user immediately
+          await signOut(auth)
+          
+          // Set error state
+          authState.authUser = null
+          authState.isAuthenticated = false
+          authState.userProfile = null
+          authState.isNewUser = false
+          authState.error = getWhitelistErrorMessage()
+          
+          console.log('Usuario no autorizado - email no en whitelist')
+          return
+        }
+        
         authState.authUser = mapFirebaseUser(firebaseUser)
         authState.isAuthenticated = true
         authState.error = null
         
-        console.log('Usuario autenticado:', authState.authUser)
+        console.log('Usuario autenticado y autorizado:', authState.authUser)
         
         // Cargar perfil de usuario
         const profile = await getUserProfile(firebaseUser.uid)
@@ -288,7 +315,8 @@ export const useAuthEnhanced = () => {
           // Log user activity
           await dbService.logUserAction(firebaseUser.uid, 'login', {
             loginMethod: 'existing_user',
-            isNewUser: profile.isNewUser
+            isNewUser: profile.isNewUser,
+            email: firebaseUser.email
           })
         } else {
           // Es un nuevo usuario, crear perfil
@@ -297,7 +325,8 @@ export const useAuthEnhanced = () => {
           // Log new user registration
           await dbService.logUserAction(firebaseUser.uid, 'register', {
             registrationMethod: 'google',
-            isNewUser: true
+            isNewUser: true,
+            email: firebaseUser.email
           })
         }
       } else {
@@ -335,9 +364,30 @@ export const useAuthEnhanced = () => {
       const result = await signInWithPopup(auth, provider)
       
       if (result.user) {
+        // Double-check email whitelist after successful Google auth
+        if (!isEmailWhitelisted(result.user.email || '')) {
+          console.warn('Email not whitelisted during sign-in:', result.user.email)
+          
+          // Log unauthorized access attempt
+          await dbService.logUserAction(result.user.uid, 'unauthorized_signin_attempt', {
+            email: result.user.email,
+            reason: 'email_not_whitelisted',
+            provider: 'google'
+          }).catch(() => {
+            // Ignore logging errors for unauthorized users
+          })
+          
+          // Sign out immediately
+          await signOut(auth)
+          
+          const errorMessage = getWhitelistErrorMessage()
+          authState.error = errorMessage
+          return { success: false, error: errorMessage }
+        }
+        
         authState.authUser = mapFirebaseUser(result.user)
         authState.isAuthenticated = true
-        console.log('Inicio de sesión con Google exitoso:', authState.authUser)
+        console.log('Inicio de sesión con Google exitoso y autorizado:', authState.authUser)
         return { success: true, data: authState.authUser }
       }
       

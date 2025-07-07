@@ -1,17 +1,25 @@
 <template>
   <div class="min-h-screen flex flex-col">
-    <MenuBar />
-    <main class="flex-1">
-      <!-- Loading State -->
-      <div v-if="isLoading" class="min-h-[60vh] flex flex-col items-center justify-center">
-        <div class="flex items-center justify-center gap-3 text-gray-600">
-          <svg class="animate-spin h-8 w-8" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-          </svg>
-          <span class="text-lg font-medium">Cargando...</span>
+    <!-- Show unauthorized access component if there's an auth error indicating whitelist failure -->
+    <UnauthorizedAccess 
+      v-if="!isLoading && authError && authError.includes('autorizada')"
+      :message="authError"
+    />
+    
+    <!-- Normal content -->
+    <div v-else>
+      <MenuBar />
+      <main class="flex-1">
+        <!-- Loading State -->
+        <div v-if="isLoading" class="min-h-[60vh] flex flex-col items-center justify-center">
+          <div class="flex items-center justify-center gap-3 text-gray-600">
+            <svg class="animate-spin h-8 w-8" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+            </svg>
+            <span class="text-lg font-medium">Cargando...</span>
+          </div>
         </div>
-      </div>
 
       <!-- Content when not loading -->
       <div v-else>
@@ -82,6 +90,7 @@
       </div>
     </main>
     <Footer />
+    </div>
   </div>
 </template>
 
@@ -95,5 +104,5 @@ import SpotifyPlaylists from '~/components/SpotifyPlaylists.vue'
 import Footer from '~/components/Footer.vue'
 
 // Authentication state
-const { isAuthenticated, isLoading } = useAuth()
+const { isAuthenticated, isLoading, error: authError } = useAuthEnhanced()
 </script>

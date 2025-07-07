@@ -32,6 +32,12 @@ export const useFirebase = () => {
       console.error('useFirebase: Firebase database not available for voting')
       throw new Error('Firebase database not available')
     }
+
+    // Check if user is authenticated for voting
+    const { isAuthenticated } = useAuthEnhanced()
+    if (!isAuthenticated.value) {
+      throw new Error('Debes iniciar sesión para votar')
+    }
     
     try {
       console.log('useFirebase: Voting for fact:', id)
@@ -40,6 +46,9 @@ export const useFirebase = () => {
       console.log('useFirebase: Vote successful for fact:', id)
     } catch (error) {
       console.error('useFirebase: Error voting for fact:', error)
+      if (error.code === 'permission-denied') {
+        throw new Error('No tienes permisos para votar')
+      }
       throw error
     }
   }

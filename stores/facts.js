@@ -40,8 +40,20 @@ export const useFactsStore = defineStore('facts', {
           this.facts[factIndex].votes++
           console.log('Facts store: Updated votes for fact:', id)
         }
+        
+        // Show success notification if available
+        if (process.client && window.useNotifications) {
+          const { notifySuccess } = useNotifications()
+          notifySuccess('¡Gracias!', 'Tu voto ha sido registrado')
+        }
       } catch (error) {
         console.error('Facts store: Error in voteFact:', error)
+        
+        // Show error notification if available
+        if (process.client && window.useNotifications) {
+          const { notifyError } = useNotifications()
+          notifyError('Error al votar', error.message || 'No se pudo registrar tu voto')
+        }
       } finally {
         this.votingId = null
       }

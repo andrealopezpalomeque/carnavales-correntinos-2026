@@ -104,9 +104,17 @@ service cloud.firestore {
     
     // Public content collections
     match /facts/{factId} {
-      // Facts: authenticated users can read, moderators can write
-      allow read: if isAuthenticated();
+      // Facts: public read access, moderators can write
+      allow read: if true;
       allow write: if isModerator();
+    }
+    
+    match /funfacts/{factId} {
+      // Fun facts: public read access, moderators can write, authenticated users can vote
+      allow read: if true;
+      allow write: if isModerator();
+      allow update: if isAuthenticated() && 
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['votes']);
     }
     
     match /news/{newsId} {

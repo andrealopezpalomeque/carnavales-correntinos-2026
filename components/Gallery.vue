@@ -91,6 +91,60 @@ const images = ref([
     alt: 'Tomando alguito',
     title: 'Tomando alguito',
     description: 'Un momento de relax y diversión'
+  },
+  {
+    src: '/images/carnaval4@2x.png',
+    alt: 'Celebración en las calles',
+    title: 'Celebración en las calles',
+    description: 'La alegría del carnaval en su máxima expresión'
+  },
+  {
+    src: '/images/carnaval5@2x.png',
+    alt: 'Desfile de comparsas',
+    title: 'Desfile de comparsas',
+    description: 'La creatividad y el color en cada paso'
+  },
+  {
+    src: '/images/carnaval6@2x.png',
+    alt: 'Fiesta en la playa',
+    title: 'Fiesta en la playa',
+    description: 'La diversión no se detiene'
+  },
+  {
+    src: '/images/carnaval7@2x.png',
+    alt: 'Carnaval en la ciudad',
+    title: 'Carnaval en la ciudad',
+    description: 'La fiesta se vive en cada rincón'
+  },
+  {
+    src: '/images/carnaval8@2x.png',
+    alt: 'Carnaval en la playa',
+    title: 'Carnaval en la playa',
+    description: 'La fiesta se vive en la playa'
+  },
+  {
+    src: '/images/carnaval9@2x.png',
+    alt: 'Carnaval en la ciudad',
+    title: 'Carnaval en la ciudad',
+    description: 'La fiesta se vive en la ciudad'
+  },
+  {
+    src: '/images/carnaval10@2x.png',
+    alt: 'Carnaval en la ciudad',
+    title: 'Carnaval en la ciudad',
+    description: 'La fiesta se vive en la ciudad'
+  },
+  {
+    src: '/images/carnaval11@2x.png',
+    alt: 'Carnaval en la ciudad',
+    title: 'Carnaval en la ciudad',
+    description: 'La fiesta se vive en la ciudad'
+  },
+  {
+    src: '/images/carnaval12@2x.png',
+    alt: 'Carnaval en la ciudad',
+    title: 'Carnaval en la ciudad',
+    description: 'La fiesta se vive en la ciudad'
   }
 ])
 

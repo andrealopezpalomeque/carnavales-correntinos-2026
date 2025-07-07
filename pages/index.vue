@@ -14,6 +14,9 @@
       <section id="related-news" class="min-h-[30vh] flex flex-col items-center justify-center">
         <RelatedNews/>
       </section>
+      <section id="spotify-playlists" class="min-h-[30vh] flex flex-col items-center justify-center">
+        <SpotifyPlaylists />
+      </section>
     </main>
     <Footer />
   </div>
@@ -25,5 +28,6 @@ import Countdown from '~/components/Countdown.vue'
 import FunFacts from '~/components/FunFacts.vue'
 import Gallery from '~/components/Gallery.vue'
 import RelatedNews from '~/components/RelatedNews.vue'
+import SpotifyPlaylists from '~/components/SpotifyPlaylists.vue'
 import Footer from '~/components/Footer.vue'
 </script>

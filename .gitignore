@@ -25,3 +25,7 @@ logs
 
 # Yarn
 yarn.lock
+
+.env.example
+
+.firebase/

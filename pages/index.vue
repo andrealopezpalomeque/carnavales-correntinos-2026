@@ -41,28 +41,28 @@
               Para acceder a fotos, curiosidades, noticias y playlists del carnaval, necesitas iniciar sesión.
             </p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 max-w-4xl mx-auto">
-              <div class="flex items-center gap-4 bg-white/60 backdrop-blur-sm rounded-full px-6 py-4 border border-green-200 hover:border-green-300 transition-all duration-200 hover:bg-white/80 hover:shadow-lg">
+              <div class="flex items-center gap-4 bg-white/60 backdrop-blur-sm rounded-full px-6 py-4 border border-green-200">
                 <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
                   <span class="text-white text-lg">🎭</span>
                 </div>
                 <span class="text-base font-medium text-gray-700">Galería de fotos exclusivas</span>
               </div>
               
-              <div class="flex items-center gap-4 bg-white/60 backdrop-blur-sm rounded-full px-6 py-4 border border-green-200 hover:border-green-300 transition-all duration-200 hover:bg-white/80 hover:shadow-lg">
+              <div class="flex items-center gap-4 bg-white/60 backdrop-blur-sm rounded-full px-6 py-4 border border-green-200">
                 <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
                   <span class="text-white text-lg">📰</span>
                 </div>
                 <span class="text-base font-medium text-gray-700">Noticias del carnaval</span>
               </div>
               
-              <div class="flex items-center gap-4 bg-white/60 backdrop-blur-sm rounded-full px-6 py-4 border border-green-200 hover:border-green-300 transition-all duration-200 hover:bg-white/80 hover:shadow-lg">
+              <div class="flex items-center gap-4 bg-white/60 backdrop-blur-sm rounded-full px-6 py-4 border border-green-200">
                 <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
                   <span class="text-white text-lg">🎵</span>
                 </div>
                 <span class="text-base font-medium text-gray-700">Playlists temáticas</span>
               </div>
               
-              <div class="flex items-center gap-4 bg-white/60 backdrop-blur-sm rounded-full px-6 py-4 border border-green-200 hover:border-green-300 transition-all duration-200 hover:bg-white/80 hover:shadow-lg">
+              <div class="flex items-center gap-4 bg-white/60 backdrop-blur-sm rounded-full px-6 py-4 border border-green-200">
                 <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
                   <span class="text-white text-lg">🎪</span>
                 </div>

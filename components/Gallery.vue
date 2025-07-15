@@ -124,8 +124,8 @@ const images = ref([
   {
     basename: 'carnaval4',
     src: '/images/carnaval4@2x.png',
-    alt: 'Celebración en las calles',
-    title: 'Celebración en las calles',
+    alt: 'Celebrando en cada rincón',
+    title: 'Celebrando en cada rincón',
     description: 'La alegría del carnaval en su máxima expresión',
     width: 1152,
     height: 768
@@ -133,54 +133,54 @@ const images = ref([
   {
     basename: 'carnaval5',
     src: '/images/carnaval5@2x.png',
-    alt: 'Desfile de comparsas',
-    title: 'Desfile de comparsas',
-    description: 'La creatividad y el color en cada paso',
+    alt: 'Del 🐓, siempre',
+    title: 'Del 🐓, siempre',
+    description: '✋',
     width: 1152,
     height: 768
   },
   {
     basename: 'carnaval6',
     src: '/images/carnaval6@2x.png',
-    alt: 'Fiesta en la playa',
-    title: 'Fiesta en la playa',
-    description: 'La diversión no se detiene',
+    alt: 'Piel de gallo',
+    title: 'Piel de gallo',
+    description: 'Contra todo pronóstico',
     width: 1152,
     height: 768
   },
   {
     basename: 'carnaval7',
     src: '/images/carnaval7@2x.png',
-    alt: 'Carnaval en la ciudad',
-    title: 'Carnaval en la ciudad',
-    description: 'La fiesta se vive en cada rincón',
+    alt: 'Carnavalero, no importa el color',
+    title: 'Carnavalero, no importa el color',
+    description: '🥳',
     width: 1152,
     height: 768
   },
   {
     basename: 'carnaval8',
     src: '/images/carnaval8@2x.png',
-    alt: 'Carnaval en la playa',
-    title: 'Carnaval en la playa',
-    description: 'La fiesta se vive en la playa',
+    alt: 'Probando la AVENIDA',
+    title: 'Probando la AVENIDA',
+    description: '2026?',
     width: 1152,
     height: 768
   },
   {
     basename: 'carnaval9',
     src: '/images/carnaval9@2x.png',
-    alt: 'Carnaval en la ciudad',
-    title: 'Carnaval en la ciudad',
-    description: 'La fiesta se vive en la ciudad',
+    alt: 'Nos queda pintado',
+    title: 'Nos queda pintado',
+    description: '🎭',
     width: 1152,
     height: 768
   },
   {
     basename: 'carnaval10',
     src: '/images/carnaval10@2x.png',
-    alt: 'Carnaval en la ciudad',
-    title: 'Carnaval en la ciudad',
-    description: 'La fiesta se vive en la ciudad',
+    alt: 'Carnaval toda la vida',
+    title: 'Carnaval toda la vida',
+    description: '💙🧡',
     width: 1152,
     height: 768,
     backgroundPosition: {
@@ -192,18 +192,18 @@ const images = ref([
   {
     basename: 'carnaval11',
     src: '/images/carnaval11@2x.png',
-    alt: 'Carnaval en la ciudad',
-    title: 'Carnaval en la ciudad',
-    description: 'La fiesta se vive en la ciudad',
+    alt: 'Nueva skin',
+    title: 'Nueva skin',
+    description: '🤫',
     width: 1152,
     height: 768
   },
   {
     basename: 'carnaval12',
     src: '/images/carnaval12@2x.png',
-    alt: 'Carnaval en la ciudad',
-    title: 'Carnaval en la ciudad',
-    description: 'La fiesta se vive en la ciudad',
+    alt: 'CORSITO? SIEMPRE',
+    title: 'CORSITO? SIEMPRE',
+    description: '💙🧡',
     width: 1152,
     height: 768
   }

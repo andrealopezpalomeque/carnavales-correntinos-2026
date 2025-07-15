@@ -88,9 +88,14 @@
 
               <!-- Vote Button -->
               <button
-                @click="factsStore.voteFact(fact.id)"
-                :disabled="factsStore.votingId === fact.id"
-                class="group/btn relative overflow-hidden bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-3 py-2 rounded-full font-medium transition-all duration-300 hover:scale-110 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-md text-xs"
+                @click="handleVote(fact.id)"
+                :disabled="factsStore.votingId === fact.id || factsStore.hasUserVoted(fact.id)"
+                :class="[
+                  'group/btn relative overflow-hidden px-3 py-2 rounded-full font-medium transition-all duration-300 shadow-md text-xs',
+                  factsStore.hasUserVoted(fact.id) 
+                    ? 'bg-gray-400 text-white cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white hover:scale-110 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none'
+                ]"
                 :aria-label="`Votar por curiosidad ${index + 1}`"
               >
                 <div class="flex items-center space-x-1">
@@ -99,14 +104,18 @@
                     class="inline-block animate-spin w-3 h-3 border border-white border-t-transparent rounded-full"
                     aria-hidden="true"
                   ></span>
+                  <span v-else-if="factsStore.hasUserVoted(fact.id)" class="text-sm" aria-hidden="true">✅</span>
                   <span v-else class="text-sm" aria-hidden="true">👍</span>
                   <span class="text-xs font-medium">
-                    {{ factsStore.votingId === fact.id ? 'Votando...' : '¡Me gusta!' }}
+                    {{ 
+                      factsStore.votingId === fact.id ? 'Votando...' : 
+                      factsStore.hasUserVoted(fact.id) ? '¡Votado!' : '¡Me gusta!' 
+                    }}
                   </span>
                 </div>
                 
                 <!-- Button sparkle effect -->
-                <div class="absolute inset-0 -top-1 -left-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover/btn:opacity-30 transform -skew-x-12 group-hover/btn:animate-pulse"></div>
+                <div v-if="!factsStore.hasUserVoted(fact.id)" class="absolute inset-0 -top-1 -left-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover/btn:opacity-30 transform -skew-x-12 group-hover/btn:animate-pulse"></div>
               </button>
             </div>
           </div>
@@ -167,9 +176,14 @@ const getRandomEmoji = (index) => {
   return funEmojis[index % funEmojis.length]
 }
 
+// Methods for enhanced functionality
+const handleVote = async (factId) => {
+  await factsStore.voteFact(factId)
+}
+
 onMounted(() => {
   factsStore.fetchFacts()
-});
+})
 </script>
 
 <style scoped>
@@ -361,5 +375,132 @@ onMounted(() => {
 
 .group:hover [class*="border-gray-100"] {
   border-color: rgb(187 247 208);
+}
+
+/* Real-time pulse animation */
+@keyframes realtime-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+.realtime-indicator {
+  animation: realtime-pulse 2s ease-in-out infinite;
+}
+
+/* Vote progress bar animation */
+@keyframes vote-progress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: var(--target-width);
+  }
+}
+
+.vote-progress-bar {
+  animation: vote-progress 1s ease-out forwards;
+}
+
+/* Celebration animation for successful votes */
+@keyframes celebrate {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.celebrate {
+  animation: celebrate 0.6s ease-out;
+}
+
+/* Voted card glow effect */
+.voted-card {
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+  border-color: rgb(34, 197, 94);
+}
+
+/* Enhanced ranking cards */
+.ranking-card {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #bae6fd;
+  transition: all 0.3s ease;
+}
+
+.ranking-card:hover {
+  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+  transform: translateY(-2px);
+}
+
+/* Activity feed animations */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.activity-item {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+/* Enhanced button states */
+.vote-button-voted {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.vote-button-voted::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: shimmer 2s infinite;
+}
+
+/* Chart progress bars */
+.chart-progress {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  border-radius: 9999px;
+  transition: width 1s ease-out;
+}
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+  .ranking-card {
+    padding: 0.75rem;
+  }
+  
+  .activity-item {
+    padding: 0.5rem;
+  }
+}
+
+/* Enhanced accessibility */
+.vote-button:focus {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
+
+.vote-button:focus-visible {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
 }
 </style>

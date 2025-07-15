@@ -1,6 +1,6 @@
 <template>
   <LayoutContainer variant="app" class="pb-6">
-    <div class="relative w-full h-96 md:h-[500px] lg:h-[600px] overflow-hidden bg-gray-900 rounded-xl shadow-lg" role="img" aria-live="polite" aria-label="Carrusel de fotos del carnaval" id="photos">
+    <div class="relative w-full h-[30rem] md:h-[40rem] lg:h-[50rem] overflow-hidden bg-gray-900 rounded-xl shadow-lg" role="img" aria-live="polite" aria-label="Carrusel de fotos del carnaval" id="photos">
     <!-- Carousel Images -->
     <div 
       class="flex transition-transform duration-500 ease-in-out h-full"
@@ -31,6 +31,7 @@
             :src="image.src"
             :alt="image.alt"
             class="w-full h-full object-cover"
+            :style="{ objectPosition: getObjectPosition(image) }"
             loading="lazy"
             :width="image.width"
             :height="image.height"
@@ -89,7 +90,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-vue-next'
 
 const images = ref([
@@ -181,7 +182,12 @@ const images = ref([
     title: 'Carnaval en la ciudad',
     description: 'La fiesta se vive en la ciudad',
     width: 1152,
-    height: 768
+    height: 768,
+    backgroundPosition: {
+      mobile: 'center',
+      tablet: '10px -132px',
+      desktop: '10px -132px'
+    }
   },
   {
     basename: 'carnaval11',
@@ -202,6 +208,31 @@ const images = ref([
     height: 768
   }
 ])
+
+// Screen size detection
+const screenWidth = ref(0)
+
+const updateScreenWidth = () => {
+  screenWidth.value = window.innerWidth
+}
+
+// Computed property for responsive object position
+const getObjectPosition = (image) => {
+  if (!image.backgroundPosition) return 'center'
+  
+  // Apply custom position only on desktop (lg screens and up)
+  if (screenWidth.value >= 1024) {
+    return image.backgroundPosition.desktop || image.backgroundPosition
+  }
+  
+  // Apply tablet-specific position
+  if (screenWidth.value >= 768) {
+    return image.backgroundPosition.tablet || 'center'
+  }
+  
+  // Mobile fallback
+  return image.backgroundPosition.mobile || 'center'
+}
 
 // Carousel state
 const currentSlide = ref(0)
@@ -314,6 +345,8 @@ const handleSwipe = () => {
 onMounted(() => {
   checkWebPSupport()
   startAutoPlay()
+  updateScreenWidth()
+  window.addEventListener('resize', updateScreenWidth)
   document.addEventListener('keydown', handleKeydown)
   document.addEventListener('touchstart', handleTouchStart)
   document.addEventListener('touchend', handleTouchEnd)
@@ -321,6 +354,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   stopAutoPlay()
+  window.removeEventListener('resize', updateScreenWidth)
   document.removeEventListener('keydown', handleKeydown)
   document.removeEventListener('touchstart', handleTouchStart)
   document.removeEventListener('touchend', handleTouchEnd)

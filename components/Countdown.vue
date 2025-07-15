@@ -11,7 +11,7 @@
         </span>
       </h1>
       <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-        La fiesta más colorida de Argentina está por comenzar
+        La fiesta más importante de Argentina está por comenzar
       </p>
     </div>
 

@@ -40,8 +40,14 @@
           class="bg-white rounded-2xl overflow-hidden animate-pulse shadow-lg border border-gray-200"
         >
           <!-- Cover area placeholder -->
-          <div class="h-48 bg-gray-200 flex items-center justify-center">
-            <div class="w-20 h-20 bg-gray-300 rounded-lg"></div>
+          <div class="h-48 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
+            <!-- Shimmer effect -->
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer"></div>
+            <div class="w-20 h-20 bg-gray-300 rounded-lg flex items-center justify-center">
+              <svg class="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </div>
           </div>
           <!-- Content area placeholder -->
           <div class="p-6">
@@ -73,19 +79,43 @@
           <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           
           <!-- Album Cover Area -->
-          <div class="relative h-48 bg-gradient-to-br from-green-500 via-emerald-500 to-green-600 flex items-center justify-center overflow-hidden">
-            <!-- Spotify-style cover placeholder -->
-            <div class="w-20 h-20 bg-black/20 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/20">
-              <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-              </svg>
+          <div class="relative h-48 overflow-hidden">
+            <!-- Background Image -->
+            <div 
+              class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+              :style="{ backgroundImage: `url('${playlist.cover}')` }"
+            ></div>
+            
+            <!-- Fallback gradient if image fails -->
+            <div class="absolute inset-0 bg-gradient-to-br from-green-500 via-emerald-500 to-green-600 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+            
+            <!-- Dark overlay for better text readability -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+            
+            <!-- Carnival-themed decorative elements -->
+            <div class="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity duration-300">
+              <div class="absolute top-2 left-2 text-2xl animate-pulse">🎭</div>
+              <div class="absolute top-2 right-2 text-2xl animate-pulse animation-delay-1000">🎪</div>
+              <div class="absolute bottom-2 left-2 text-2xl animate-pulse animation-delay-500">🎵</div>
+              <div class="absolute bottom-2 right-2 text-2xl animate-pulse animation-delay-1500">🎉</div>
+            </div>
+
+            <!-- Play button overlay -->
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+              <div class="w-16 h-16 bg-green-500/90 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20 shadow-lg hover:bg-green-400 hover:scale-110 transition-all duration-200">
+                <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </div>
             </div>
 
             <!-- Spotify Logo -->
             <div class="absolute top-4 right-4 opacity-70 group-hover:opacity-100 transition-opacity duration-300">
-              <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z"/>
-              </svg>
+              <div class="bg-black/30 rounded-full p-2 backdrop-blur-sm">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z"/>
+                </svg>
+              </div>
             </div>
           </div>
 
@@ -97,6 +127,18 @@
             <p class="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
               {{ playlist.description }}
             </p>
+            
+            <!-- Genre badges -->
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span 
+                v-for="mood in playlist.moods.slice(0, 3)" 
+                :key="mood"
+                class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200"
+              >
+                <span>{{ getMoodEmoji(mood) }}</span>
+                <span>{{ mood }}</span>
+              </span>
+            </div>
             
             <!-- Stats Row -->
             <div class="flex items-center justify-between text-xs text-gray-500">
@@ -120,16 +162,25 @@
                 <div
                   v-for="mood in playlist.moods.slice(0, 3)"
                   :key="mood"
-                  class="w-2 h-2 rounded-full"
+                  class="w-3 h-3 rounded-full flex items-center justify-center text-xs shadow-sm border border-white/20"
                   :class="getMoodColor(mood)"
                   :title="mood"
-                ></div>
+                >
+                  <span class="text-white text-xs leading-none">{{ getMoodEmoji(mood) }}</span>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Hover Effect Borders -->
           <div class="absolute inset-0 border-2 border-transparent group-hover:border-green-500/50 rounded-2xl transition-colors duration-300"></div>
+          
+          <!-- Floating music notes animation -->
+          <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
+            <div class="absolute top-1/4 left-1/4 text-green-400 text-sm animate-float">♫</div>
+            <div class="absolute top-1/2 right-1/4 text-emerald-400 text-sm animate-float animation-delay-1000">♪</div>
+            <div class="absolute bottom-1/4 left-1/3 text-green-300 text-sm animate-float animation-delay-500">♬</div>
+          </div>
         </div>
       </div>
 
@@ -224,15 +275,15 @@ const openPlaylist = (url) => {
 
 const getMoodColor = (mood) => {
   const colors = {
-    'fiesta': 'bg-red-500',
-    'tradicion': 'bg-yellow-500',
-    'alegria': 'bg-orange-500',
-    'nostalgia': 'bg-blue-500',
-    'energia': 'bg-green-500',
-    'baile': 'bg-pink-500',
-    'folklore': 'bg-purple-500'
+    'fiesta': 'bg-gradient-to-r from-red-500 to-pink-500',
+    'tradicion': 'bg-gradient-to-r from-yellow-500 to-orange-500',
+    'alegria': 'bg-gradient-to-r from-orange-500 to-red-500',
+    'nostalgia': 'bg-gradient-to-r from-blue-500 to-purple-500',
+    'energia': 'bg-gradient-to-r from-green-500 to-emerald-500',
+    'baile': 'bg-gradient-to-r from-pink-500 to-rose-500',
+    'folklore': 'bg-gradient-to-r from-purple-500 to-indigo-500'
   }
-  return colors[mood] || 'bg-gray-500'
+  return colors[mood] || 'bg-gradient-to-r from-gray-500 to-gray-600'
 }
 
 const getMoodEmoji = (mood) => {
@@ -319,6 +370,32 @@ onMounted(() => {
 /* Delayed animation for background elements */
 .animation-delay-2000 {
   animation-delay: 2s;
+}
+
+.animation-delay-500 {
+  animation-delay: 0.5s;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1s;
+}
+
+.animation-delay-1500 {
+  animation-delay: 1.5s;
+}
+
+/* Shimmer animation for loading states */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s ease-in-out infinite;
 }
 
 /* Glass morphism effect enhancement */
@@ -439,6 +516,17 @@ onMounted(() => {
   box-shadow: 0 20px 40px -8px rgba(29, 185, 84, 0.2);
 }
 
+/* Image zoom effect on hover */
+.group:hover [class*="bg-cover"] {
+  transform: scale(1.1);
+}
+
+/* Play button hover effects */
+.group:hover .bg-green-500\/90 {
+  background-color: rgba(29, 185, 84, 0.95);
+  box-shadow: 0 8px 32px rgba(29, 185, 84, 0.4);
+}
+
 /* Card content transitions */
 .group .text-gray-800 {
   transition: color 0.3s ease;
@@ -465,6 +553,37 @@ onMounted(() => {
   50% {
     opacity: 0.5;
   }
+}
+
+/* Floating animation for music notes */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-10px) rotate(5deg);
+    opacity: 1;
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Enhanced card shadows with depth */
+.group {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.group:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(34, 197, 94, 0.1);
+}
+
+/* Enhanced mood indicator styles */
+.group:hover [class*="bg-gradient-to-r"] {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Light theme scrollbar */

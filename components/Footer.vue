@@ -1,6 +1,6 @@
 <template>
   <footer class="mt-auto">
-    <div class="container-standard">
+    <LayoutContainer variant="app">
       <div class="flex flex-col justify-between items-center h-16 py-4">
         <!-- Copyright Section -->
         <div class="text-center">
@@ -12,7 +12,7 @@
           </p>
         </div>
       </div>
-    </div>
+    </LayoutContainer>
   </footer>
 </template>
 

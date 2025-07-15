@@ -1,6 +1,13 @@
 <template>
-  <section id="fun-facts" class="section-standard bg-gradient-to-br from-green-50 to-emerald-50 min-h-screen" aria-labelledby="fun-facts-heading">
-    <div class="container-standard">
+  <LayoutSection 
+    id="fun-facts" 
+    background="gradient" 
+    spacing="base" 
+    min-height="screen"
+    container="app"
+    class="relative overflow-hidden"
+    aria-labelledby="fun-facts-heading"
+  >
       <!-- Header with modern style -->
       <div class="text-center mb-16">
         <div class="flex items-center justify-center mb-6">
@@ -42,7 +49,7 @@
           v-for="(fact, index) in factsStore.facts"
           :key="fact.id"
           :class="[
-            'group relative transition-all duration-700 hover:scale-105',
+            'group relative transition-all duration-700 hover:scale-105 w-full max-w-full',
             index % 2 === 0 ? 'flex flex-col lg:flex-row items-start' : 'flex flex-col lg:flex-row-reverse items-start'
           ]"
           :style="{ animationDelay: `${index * 200}ms` }"
@@ -62,10 +69,10 @@
 
           <!-- Speech Bubble -->
           <div :class="[
-            'relative flex-1 min-w-0',
+            'relative flex-1 min-w-0 max-w-full',
             index % 2 === 0 ? 'speech-bubble-right' : 'speech-bubble-left'
           ]">
-            <div class="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 group-hover:shadow-2xl group-hover:border-green-200 transition-all duration-500 relative overflow-hidden">
+            <div class="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 group-hover:shadow-2xl group-hover:border-green-200 transition-all duration-500 relative overflow-hidden w-full">
               <!-- Background Pattern -->
               <div class="absolute inset-0 opacity-5">
                 <div class="absolute top-4 right-4 text-6xl text-green-500 rotate-12">🎭</div>
@@ -159,8 +166,7 @@
           </div>
         </div>
       </div>
-    </div>
-  </section>
+  </LayoutSection>
 </template>
 
 <script setup>

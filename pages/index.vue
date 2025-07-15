@@ -29,7 +29,7 @@
 
         <!-- Auth Gate Message for Non-Authenticated Users -->
         <section v-if="!isAuthenticated" class="min-h-[40vh] flex flex-col items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50">
-          <div class="w-full mx-auto text-center p-8 container-standard">
+          <LayoutContainer variant="app" class="w-full mx-auto text-center p-8">
             <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
@@ -68,26 +68,15 @@
                 <span class="text-base font-medium text-gray-700">Curiosidades y datos</span>
               </div>
             </div>
-          </div>
+          </LayoutContainer>
         </section>
 
         <!-- Protected Content - Only for Authenticated Users -->
         <template v-if="isAuthenticated">
-          <section id="photos" class="min-h-[30vh] flex flex-col items-center justify-center" aria-labelledby="photos-heading">
-            <h2 id="photos-heading" class="sr-only">Galería de fotos</h2>
-            <Gallery/>
-          </section>
-          <section id="fun-facts" class="min-h-[30vh] flex flex-col items-center justify-center" aria-labelledby="fun-facts-heading">
-            <FunFacts/>
-          </section>
-          <section id="related-news" class="min-h-[30vh] flex flex-col items-center justify-center" aria-labelledby="news-heading">
-            <h2 id="news-heading" class="sr-only">Noticias relacionadas</h2>
-            <RelatedNews/>
-          </section>
-          <section id="spotify-playlists" class="min-h-[30vh] flex flex-col items-center justify-center" aria-labelledby="playlists-heading">
-            <h2 id="playlists-heading" class="sr-only">Playlists de Spotify</h2>
-            <SpotifyPlaylists />
-          </section>
+          <Gallery/>
+          <FunFacts/>
+          <RelatedNews/>
+          <SpotifyPlaylists />
         </template>
       </div>
     </main>

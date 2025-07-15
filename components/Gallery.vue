@@ -1,5 +1,5 @@
 <template>
-  <div class="container-standard pb-6">
+  <LayoutContainer variant="app" class="pb-6">
     <div class="relative w-full h-96 md:h-[500px] lg:h-[600px] overflow-hidden bg-gray-900 rounded-xl shadow-lg" role="img" aria-live="polite" aria-label="Carrusel de fotos del carnaval">
     <!-- Carousel Images -->
     <div 
@@ -68,7 +68,7 @@
       <Play v-else class="w-5 h-5" aria-hidden="true" />
     </button>
     </div>
-  </div>
+  </LayoutContainer>
 </template>
 
 <script setup>

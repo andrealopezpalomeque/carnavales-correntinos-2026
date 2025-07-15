@@ -1,13 +1,18 @@
 <template>
-  <section id="related-news" class="section-standard bg-gradient-to-br from-gray-50 to-white min-h-screen relative overflow-hidden">
+  <LayoutSection 
+    id="related-news" 
+    background="muted" 
+    spacing="base" 
+    min-height="screen"
+    container="app"
+    class="relative overflow-hidden"
+  >
     <!-- Animated Background Pattern -->
-    <div class="absolute inset-0 opacity-5">
+    <div class="absolute inset-0 opacity-5 overflow-hidden">
       <div class="absolute inset-0 bg-gradient-to-br from-gray-100 via-gray-50 to-white"></div>
-      <div class="absolute top-0 left-1/4 w-96 h-96 bg-green-200 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
-      <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"></div>
+      <div class="absolute top-0 left-1/4 w-64 h-64 bg-green-200 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+      <div class="absolute bottom-0 right-1/4 w-64 h-64 bg-emerald-200 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"></div>
     </div>
-
-    <div class="container-standard">
       <!-- Header with modern newspaper style -->
       <div class="text-center mb-16">
         <div class="flex items-center justify-center mb-6">
@@ -137,8 +142,7 @@
           </div>
         </div>
       </div>
-    </div>
-  </section>
+  </LayoutSection>
 </template>
 
 <script setup>

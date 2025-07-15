@@ -1,6 +1,6 @@
 <template>
   <nav class="bg-white shadow-md border-b border-gray-100 sticky top-0 z-50" role="navigation" aria-label="Navegación principal">
-    <div class="container-standard">
+    <div class="container-app">
       <div class="flex justify-between items-center h-16">
         <!-- Logo Section -->
         <div class="flex items-center">
@@ -126,7 +126,7 @@
 
     <!-- Mobile menu -->
     <div v-show="mobileMenuOpen" id="mobile-menu" class="md:hidden bg-white border-t border-gray-100">
-      <div class="container-standard pt-2 pb-3 space-y-1">
+      <div class="container-app pt-2 pb-3 space-y-1">
         <!-- Mobile Navigation Links -->
         <button 
           v-if="isAuthenticated" 

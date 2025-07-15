@@ -1,5 +1,5 @@
 <template>
-  <div class="container-standard section-hero">
+  <LayoutContainer variant="app" class="section-hero">
     <!-- Hero Title Section -->
     <div class="text-center mb-10">
       <h1 class="text-5xl md:text-7xl leading-tight mb-4 font-bold">
@@ -68,7 +68,7 @@
         31 de Enero • 22:00 hs
       </p>
     </div>
-  </div>
+  </LayoutContainer>
 </template>
 
 <script setup>

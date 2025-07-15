@@ -13,12 +13,29 @@
         :key="index"
         class="w-full h-full flex-shrink-0 relative"
       >
-        <img
-          :src="image.src"
-          :alt="image.alt"
-          class="w-full h-full object-cover"
-          loading="lazy"
-        />
+        <picture class="w-full h-full">
+          <!-- WebP sources with responsive sizes -->
+          <source
+            :srcset="getResponsiveSrcset(image.basename, 'webp')"
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 1152px"
+            type="image/webp"
+          />
+          <!-- PNG fallback with responsive sizes -->
+          <source
+            :srcset="getResponsiveSrcset(image.basename, 'png')"
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 1152px"
+            type="image/png"
+          />
+          <!-- Fallback img tag -->
+          <img
+            :src="image.src"
+            :alt="image.alt"
+            class="w-full h-full object-cover"
+            loading="lazy"
+            :width="image.width"
+            :height="image.height"
+          />
+        </picture>
         <!-- Overlay with text -->
         <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent">
           <div class="text-center text-white px-6 py-10">
@@ -77,76 +94,112 @@ import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-vue-next'
 
 const images = ref([
   {
+    basename: 'carnaval1',
     src: '/images/carnaval1@2x.png',
     alt: 'Inaguración carnavales 2025',
     title: 'Inaguración carnavales 2025',
-    description: 'Disfrutando desde el minuto uno'
+    description: 'Disfrutando desde el minuto uno',
+    width: 1152, // Default @2x width - update based on actual dimensions
+    height: 768  // Default @2x height - update based on actual dimensions
   },
   {
+    basename: 'carnaval2',
     src: '/images/carnaval2@2x.png',
     alt: 'Primera aparición en el Palco Oficial',
     title: 'Primera aparición en el Palco Oficial',
-    description: 'Inicio de una larga aventura'
+    description: 'Inicio de una larga aventura',
+    width: 1152,
+    height: 768
   },
   {
-   src: '/images/carnaval3@2x.png',
+    basename: 'carnaval3',
+    src: '/images/carnaval3@2x.png',
     alt: 'Tomando alguito',
     title: 'Tomando alguito',
-    description: 'Un momento de relax y diversión'
+    description: 'Un momento de relax y diversión',
+    width: 1152,
+    height: 768
   },
   {
+    basename: 'carnaval4',
     src: '/images/carnaval4@2x.png',
     alt: 'Celebración en las calles',
     title: 'Celebración en las calles',
-    description: 'La alegría del carnaval en su máxima expresión'
+    description: 'La alegría del carnaval en su máxima expresión',
+    width: 1152,
+    height: 768
   },
   {
+    basename: 'carnaval5',
     src: '/images/carnaval5@2x.png',
     alt: 'Desfile de comparsas',
     title: 'Desfile de comparsas',
-    description: 'La creatividad y el color en cada paso'
+    description: 'La creatividad y el color en cada paso',
+    width: 1152,
+    height: 768
   },
   {
+    basename: 'carnaval6',
     src: '/images/carnaval6@2x.png',
     alt: 'Fiesta en la playa',
     title: 'Fiesta en la playa',
-    description: 'La diversión no se detiene'
+    description: 'La diversión no se detiene',
+    width: 1152,
+    height: 768
   },
   {
+    basename: 'carnaval7',
     src: '/images/carnaval7@2x.png',
     alt: 'Carnaval en la ciudad',
     title: 'Carnaval en la ciudad',
-    description: 'La fiesta se vive en cada rincón'
+    description: 'La fiesta se vive en cada rincón',
+    width: 1152,
+    height: 768
   },
   {
+    basename: 'carnaval8',
     src: '/images/carnaval8@2x.png',
     alt: 'Carnaval en la playa',
     title: 'Carnaval en la playa',
-    description: 'La fiesta se vive en la playa'
+    description: 'La fiesta se vive en la playa',
+    width: 1152,
+    height: 768
   },
   {
+    basename: 'carnaval9',
     src: '/images/carnaval9@2x.png',
     alt: 'Carnaval en la ciudad',
     title: 'Carnaval en la ciudad',
-    description: 'La fiesta se vive en la ciudad'
+    description: 'La fiesta se vive en la ciudad',
+    width: 1152,
+    height: 768
   },
   {
+    basename: 'carnaval10',
     src: '/images/carnaval10@2x.png',
     alt: 'Carnaval en la ciudad',
     title: 'Carnaval en la ciudad',
-    description: 'La fiesta se vive en la ciudad'
+    description: 'La fiesta se vive en la ciudad',
+    width: 1152,
+    height: 768
   },
   {
+    basename: 'carnaval11',
     src: '/images/carnaval11@2x.png',
     alt: 'Carnaval en la ciudad',
     title: 'Carnaval en la ciudad',
-    description: 'La fiesta se vive en la ciudad'
+    description: 'La fiesta se vive en la ciudad',
+    width: 1152,
+    height: 768
   },
   {
+    basename: 'carnaval12',
     src: '/images/carnaval12@2x.png',
     alt: 'Carnaval en la ciudad',
     title: 'Carnaval en la ciudad',
-    description: 'La fiesta se vive en la ciudad'
+    description: 'La fiesta se vive en la ciudad',
+    width: 1152,
+    height: 768
   }
 ])
 
@@ -154,6 +207,31 @@ const images = ref([
 const currentSlide = ref(0)
 const isPlaying = ref(true)
 let autoPlayInterval = null
+
+// Responsive image generation
+const getResponsiveSrcset = (basename, format) => {
+  const extension = format === 'webp' ? 'webp' : 'png'
+  return [
+    `/images/${basename}@1x.${extension} 1x`,
+    `/images/${basename}@1.5x.${extension} 1.5x`,
+    `/images/${basename}@2x.${extension} 2x`
+  ].join(', ')
+}
+
+// Check if WebP is supported
+const supportsWebP = ref(true)
+const checkWebPSupport = () => {
+  const canvas = document.createElement('canvas')
+  canvas.width = 1
+  canvas.height = 1
+  const ctx = canvas.getContext('2d')
+  if (ctx) {
+    const dataUrl = canvas.toDataURL('image/webp')
+    supportsWebP.value = dataUrl.startsWith('data:image/webp')
+  } else {
+    supportsWebP.value = false
+  }
+}
 
 // Navigation functions
 const nextSlide = () => {
@@ -234,6 +312,7 @@ const handleSwipe = () => {
 
 // Lifecycle hooks
 onMounted(() => {
+  checkWebPSupport()
   startAutoPlay()
   document.addEventListener('keydown', handleKeydown)
   document.addEventListener('touchstart', handleTouchStart)

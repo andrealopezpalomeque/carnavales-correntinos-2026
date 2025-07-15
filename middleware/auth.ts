@@ -4,14 +4,25 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
   const { isAuthenticated, isLoading } = useAuthEnhanced()
 
-  // Wait for auth state to be determined
+  // If still loading, we need to wait for auth state to be determined
   if (isLoading.value) {
-    // Show loading or return to let the component handle loading state
-    return
+    // Return a promise that resolves when auth state is ready
+    return new Promise((resolve) => {
+      const unwatch = watch(isLoading, (loading) => {
+        if (!loading) {
+          unwatch()
+          if (!isAuthenticated.value) {
+            resolve(navigateTo('/auth'))
+          } else {
+            resolve()
+          }
+        }
+      })
+    })
   }
 
-  // Redirect to home if not authenticated
+  // Redirect to auth page if not authenticated
   if (!isAuthenticated.value) {
-    return navigateTo('/?error=auth-required')
+    return navigateTo('/auth')
   }
 })

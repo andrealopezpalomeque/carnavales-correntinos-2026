@@ -8,7 +8,6 @@
     
     <!-- Normal content -->
     <div v-else>
-      <MenuBar />
       <main class="flex-1">
         <!-- Loading State -->
         <div v-if="isLoading" class="min-h-[60vh] flex flex-col items-center justify-center">
@@ -95,7 +94,6 @@
 </template>
 
 <script setup>
-import MenuBar from '~/components/MenuBar.vue'
 import Countdown from '~/components/Countdown.vue'
 import FunFacts from '~/components/FunFacts.vue'
 import Gallery from '~/components/Gallery.vue'

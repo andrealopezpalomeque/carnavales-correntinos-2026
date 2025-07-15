@@ -119,18 +119,80 @@
         <p class="text-sm text-red-700 mb-4">
           Las siguientes acciones son permanentes y no se pueden deshacer.
         </p>
-        <div class="space-y-3">
+        <div class="flex gap-2">
           <button
-            @click="deactivateAccount"
+            @click="showDeactivateConfirmation"
             class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200 text-sm"
           >
             Desactivar Cuenta
           </button>
           <button
             @click="deleteAccount"
-            class="px-4 py-2 bg-red-800 text-white rounded-md hover:bg-red-900 transition-colors duration-200 text-sm ml-3"
+            class="px-4 py-2 bg-red-800 text-white rounded-md hover:bg-red-900 transition-colors duration-200 text-sm"
           >
             Eliminar Cuenta Permanentemente
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Deactivation Confirmation Modal -->
+    <div v-if="showDeactivateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <h3 class="text-lg font-semibold text-red-900 mb-4">Desactivar Cuenta</h3>
+        <p class="text-gray-700 mb-6">
+          ¿Estás seguro de que quieres desactivar tu cuenta? Podrás reactivarla más tarde.
+        </p>
+        
+        <div class="flex gap-3">
+          <button
+            @click="cancelDeactivateAccount"
+            class="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="confirmDeactivateAccount"
+            :disabled="isDeactivating"
+            class="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {{ isDeactivating ? 'Desactivando...' : 'Desactivar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Account Deletion Confirmation Modal -->
+    <div v-if="showDeleteConfirmation" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <h3 class="text-lg font-semibold text-red-900 mb-4">Eliminar Cuenta Permanentemente</h3>
+        <p class="text-gray-700 mb-4">
+          Esta acción eliminará permanentemente tu cuenta y todos tus datos. No se puede deshacer.
+        </p>
+        <p class="text-gray-700 mb-4">
+          Para confirmar, escribe <strong>ELIMINAR</strong> en el campo de abajo:
+        </p>
+        
+        <input
+          v-model="deleteConfirmationText"
+          type="text"
+          placeholder="Escribe ELIMINAR"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 mb-4"
+        />
+        
+        <div class="flex gap-3">
+          <button
+            @click="cancelDeleteAccount"
+            class="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="confirmDeleteAccount"
+            :disabled="deleteConfirmationText !== 'ELIMINAR' || isDeletingAccount"
+            class="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {{ isDeletingAccount ? 'Eliminando...' : 'Eliminar Cuenta' }}
           </button>
         </div>
       </div>
@@ -165,6 +227,11 @@ const {
 // Local state
 const isDownloading = ref(false)
 const isRefreshing = ref(false)
+const isDeletingAccount = ref(false)
+const showDeleteConfirmation = ref(false)
+const deleteConfirmationText = ref('')
+const showDeactivateModal = ref(false)
+const isDeactivating = ref(false)
 
 // Computed properties
 const membershipDays = computed(() => {
@@ -259,43 +326,88 @@ const toggleEmailVisibility = async () => {
   })
 }
 
-const deactivateAccount = async () => {
-  const confirmed = confirm('¿Estás seguro de que quieres desactivar tu cuenta? Podrás reactivarla más tarde.')
-  
-  if (confirmed) {
-    try {
-      await updateUserProfile({ isActive: false })
-      alert('Tu cuenta ha sido desactivada.')
-    } catch (error) {
-      console.error('Error deactivating account:', error)
-      alert('Error al desactivar la cuenta.')
-    }
+const showDeactivateConfirmation = () => {
+  showDeactivateModal.value = true
+}
+
+const confirmDeactivateAccount = async () => {
+  try {
+    isDeactivating.value = true
+    await updateUserProfile({ isActive: false })
+    alert('Tu cuenta ha sido desactivada.')
+    showDeactivateModal.value = false
+  } catch (error) {
+    console.error('Error deactivating account:', error)
+    alert('Error al desactivar la cuenta.')
+  } finally {
+    isDeactivating.value = false
   }
+}
+
+const cancelDeactivateAccount = () => {
+  showDeactivateModal.value = false
 }
 
 const deleteAccount = async () => {
-  const confirmed = confirm('¿Estás ABSOLUTAMENTE seguro? Esta acción eliminará permanentemente tu cuenta y todos tus datos. Escribe "ELIMINAR" para confirmar.')
-  
-  if (confirmed) {
-    const confirmation = prompt('Escribe "ELIMINAR" para confirmar:')
-    if (confirmation === 'ELIMINAR') {
-      try {
-        // TODO: Implement account deletion
-        alert('Funcionalidad de eliminación de cuenta aún no implementada.')
-      } catch (error) {
-        console.error('Error deleting account:', error)
-        alert('Error al eliminar la cuenta.')
-      }
+  // Show confirmation modal
+  showDeleteConfirmation.value = true
+}
+
+const confirmDeleteAccount = async () => {
+  if (deleteConfirmationText.value !== 'ELIMINAR') {
+    return
+  }
+
+  try {
+    isDeletingAccount.value = true
+    
+    if (!userProfile.value?.uid) {
+      alert('No se pudo encontrar la información del usuario.')
+      return
     }
+
+    // Delete user's Firestore document
+    const { $firebase } = useNuxtApp()
+    if ($firebase?.db) {
+      const { doc, deleteDoc } = await import('firebase/firestore')
+      const userDocRef = doc($firebase.db, 'users', userProfile.value.uid)
+      await deleteDoc(userDocRef)
+    }
+
+    // Delete user's Firebase Auth account
+    if ($firebase?.auth?.currentUser) {
+      const { deleteUser } = await import('firebase/auth')
+      await deleteUser($firebase.auth.currentUser)
+    }
+
+    // Show success message
+    alert('Tu cuenta ha sido eliminada permanentemente.')
+    
+    // Redirect to home page
+    navigateTo('/')
+  } catch (error: any) {
+    console.error('Error deleting account:', error)
+    
+    // Handle specific Firebase errors
+    let errorMessage = 'Error al eliminar la cuenta.'
+    if (error.code === 'auth/requires-recent-login') {
+      errorMessage = 'Por seguridad, debes iniciar sesión nuevamente antes de eliminar tu cuenta.'
+    }
+    
+    alert(errorMessage)
+  } finally {
+    isDeletingAccount.value = false
+    showDeleteConfirmation.value = false
+    deleteConfirmationText.value = ''
   }
 }
 
-// Check authentication
-onMounted(() => {
-  if (!isAuthenticated.value) {
-    navigateTo('/auth')
-  }
-})
+const cancelDeleteAccount = () => {
+  showDeleteConfirmation.value = false
+  deleteConfirmationText.value = ''
+}
+
+// Authentication is handled by the 'auth' middleware
 </script>
 
 <style scoped>

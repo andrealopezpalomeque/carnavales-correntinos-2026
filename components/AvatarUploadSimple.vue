@@ -33,7 +33,7 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
           </svg>
-          <div class="text-xs text-white">{{ uploadPercent }}%</div>
+          <div class="text-xs text-white">{{ uploadProgress }}%</div>
         </div>
       </div>
     </div>
@@ -65,22 +65,47 @@
     </div>
     
     <!-- Actions -->
-    <div v-if="showActions" class="absolute top-full left-0 right-0 mt-2 flex space-x-2">
+    <div v-if="showActions" class="absolute top-full left-0 right-0 mt-2 flex space-x-2 z-10">
       <button
         @click="triggerFileInput"
         :disabled="isUploading"
-        class="flex-1 px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+        class="flex-1 px-3 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 font-medium shadow-sm"
       >
         Cambiar foto
       </button>
       <button
-        v-if="currentAvatarUrl && allowRemove"
-        @click="removeAvatar"
+        v-if="currentUrl && allowRemove"
+        @click="showRemoveConfirmation"
         :disabled="isUploading"
-        class="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+        class="px-3 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 font-medium shadow-sm"
       >
         Eliminar
       </button>
+    </div>
+    
+    <!-- Remove Avatar Confirmation Modal -->
+    <div v-if="showRemoveModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Eliminar foto de perfil</h3>
+        <p class="text-gray-700 mb-6">
+          ¿Estás seguro de que quieres eliminar tu foto de perfil?
+        </p>
+        
+        <div class="flex gap-3">
+          <button
+            @click="cancelRemove"
+            class="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="confirmRemove"
+            class="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+          >
+            Eliminar
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -118,10 +143,6 @@ const props = defineProps({
   allowRemove: {
     type: Boolean,
     default: true
-  },
-  userId: {
-    type: String,
-    required: true
   }
 })
 
@@ -129,28 +150,25 @@ const props = defineProps({
 const emit = defineEmits(['upload-success', 'upload-error', 'remove-avatar'])
 
 // Composables
-const { uploadAvatar, deleteFile, isUploading, uploadProgress, error, createPreview, revokePreview } = useFileUpload()
+const { processAvatar, isUploading, uploadProgress, error, createPreview, revokePreview } = useAvatarUpload()
 
 // Refs
 const fileInput = ref<HTMLInputElement | null>(null)
 const previewUrl = ref<string | null>(null)
+const showRemoveModal = ref(false)
 
 // Computed
 const currentAvatarUrl = computed(() => previewUrl.value || props.currentUrl)
 
-const uploadPercent = computed(() => {
-  return Math.round(uploadProgress.value.percentage)
-})
-
 const avatarClasses = computed(() => {
   const sizeClasses = {
-    sm: 'w-12 h-12 text-sm',
-    md: 'w-16 h-16 text-lg',
-    lg: 'w-20 h-20 text-xl',
-    xl: 'w-32 h-32 text-3xl'
+    sm: 'w-12 h-12 min-w-[3rem] min-h-[3rem] text-sm',
+    md: 'w-16 h-16 min-w-[4rem] min-h-[4rem] text-lg',
+    lg: 'w-20 h-20 min-w-[5rem] min-h-[5rem] sm:w-24 sm:h-24 sm:min-w-[6rem] sm:min-h-[6rem] text-xl',
+    xl: 'w-24 h-24 min-w-[6rem] min-h-[6rem] sm:w-32 sm:h-32 sm:min-w-[8rem] sm:min-h-[8rem] text-2xl sm:text-3xl'
   }
   
-  return `${sizeClasses[props.size]} rounded-full`
+  return `${sizeClasses[props.size]} rounded-full flex-shrink-0 aspect-square`
 })
 
 // Methods
@@ -164,7 +182,9 @@ const handleFileSelect = async (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
   
-  if (!file) return
+  if (!file) {
+    return
+  }
   
   try {
     // Show preview immediately
@@ -173,17 +193,17 @@ const handleFileSelect = async (event: Event) => {
     }
     previewUrl.value = createPreview(file)
     
-    // Upload file
-    const result = await uploadAvatar(file, props.userId)
+    // Process file to base64
+    const result = await processAvatar(file)
     
-    if (result.success && result.url) {
+    if (result.success && result.dataUrl) {
       // Clean up preview
       if (previewUrl.value) {
         revokePreview(previewUrl.value)
         previewUrl.value = null
       }
       
-      emit('upload-success', result.url)
+      emit('upload-success', result.dataUrl)
     } else {
       // Revert preview on error
       if (previewUrl.value) {
@@ -191,18 +211,16 @@ const handleFileSelect = async (event: Event) => {
         previewUrl.value = null
       }
       
-      emit('upload-error', result.error || 'Error al subir la imagen')
+      emit('upload-error', result.error || 'Error al procesar la imagen')
     }
   } catch (uploadError) {
-    console.error('Error in file upload:', uploadError)
-    
     // Clean up preview
     if (previewUrl.value) {
       revokePreview(previewUrl.value)
       previewUrl.value = null
     }
     
-    emit('upload-error', 'Error inesperado al subir la imagen')
+    emit('upload-error', 'Error inesperado al procesar la imagen')
   }
   
   // Clear file input
@@ -211,24 +229,18 @@ const handleFileSelect = async (event: Event) => {
   }
 }
 
-const removeAvatar = async () => {
+const showRemoveConfirmation = () => {
   if (!props.currentUrl) return
-  
-  const confirmed = confirm('¿Estás seguro de que quieres eliminar tu foto de perfil?')
-  if (!confirmed) return
-  
-  try {
-    const result = await deleteFile(props.currentUrl)
-    
-    if (result.success) {
-      emit('remove-avatar')
-    } else {
-      emit('upload-error', result.error || 'Error al eliminar la imagen')
-    }
-  } catch (deleteError) {
-    console.error('Error removing avatar:', deleteError)
-    emit('upload-error', 'Error inesperado al eliminar la imagen')
-  }
+  showRemoveModal.value = true
+}
+
+const confirmRemove = () => {
+  showRemoveModal.value = false
+  emit('remove-avatar')
+}
+
+const cancelRemove = () => {
+  showRemoveModal.value = false
 }
 
 // Cleanup

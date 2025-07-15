@@ -92,13 +92,11 @@
 <script setup lang="ts">
 import { collection, addDoc, getDocs } from 'firebase/firestore'
 
-// Auth protection - only for authenticated users
-const { isAuthenticated } = useAuth()
-
-// Redirect if not authenticated
-if (process.client && !isAuthenticated.value) {
-  await navigateTo('/')
-}
+// Page meta
+definePageMeta({
+  middleware: 'admin',
+  layout: 'default'
+})
 
 // State
 const facts = ref([])

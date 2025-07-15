@@ -34,11 +34,11 @@
             v-if="authUser?.photoURL" 
             :src="authUser.photoURL" 
             :alt="authUser.displayName || 'Usuario'"
-            class="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+            class="w-12 h-12 rounded-full object-cover border-2 border-gray-200 aspect-square"
           />
           <div 
             v-else 
-            class="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center text-lg font-bold"
+            class="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center text-lg font-bold aspect-square"
           >
             {{ getInitials(authUser?.displayName || authUser?.email || 'U') }}
           </div>
@@ -219,7 +219,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import type { CreateUserProfileData } from '~/types/user'
+import type { UpdateUserProfileData } from '~/types/user'
 
 // Composables
 const { 
@@ -235,8 +235,8 @@ const {
 const isLoading = ref(false)
 const error = ref('')
 
-// Form data
-const formData = ref<CreateUserProfileData>({
+// Form data (using UpdateUserProfileData to include displayName)
+const formData = ref<UpdateUserProfileData>({
   displayName: '',
   firstName: '',
   lastName: '',
@@ -291,15 +291,18 @@ const completeSetup = async () => {
     
     if (result.success) {
       // Mark user as no longer new
-      await updateUserProfile({ isNewUser: false })
+      const markAsNotNewResult = await updateUserProfile({ isNewUser: false })
       
-      // Redirect to dashboard or home
-      await navigateTo('/')
+      if (markAsNotNewResult.success) {
+        // Redirect to dashboard or home
+        await navigateTo('/')
+      } else {
+        error.value = markAsNotNewResult.error || 'Error al finalizar configuración'
+      }
     } else {
       error.value = result.error || 'Error al completar el perfil'
     }
   } catch (err) {
-    console.error('Error completing setup:', err)
     error.value = 'Error inesperado al completar el perfil'
   } finally {
     isLoading.value = false
@@ -327,11 +330,7 @@ const skipSetup = async () => {
 
 // Initialize form with auth user data
 onMounted(() => {
-  if (!isAuthenticated.value) {
-    navigateTo('/auth')
-    return
-  }
-
+  // Authentication is handled by page middleware
   if (authUser.value) {
     formData.value.displayName = authUser.value.displayName || authUser.value.email || ''
     

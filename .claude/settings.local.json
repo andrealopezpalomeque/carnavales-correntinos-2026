@@ -4,7 +4,11 @@
       "Bash(npm install:*)",
       "Bash(mkdir:*)",
       "Bash(touch:*)",
-      "Bash(yarn dev)"
+      "Bash(yarn dev)",
+      "Bash(npm run dev:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

@@ -11,15 +11,10 @@ export const useFactsStore = defineStore('facts', {
     async fetchFacts() {
       this.isLoading = true
       try {
-        console.log('Facts store: Starting fetchFacts')
-        
         // Use the composable directly
         const { getFacts } = useFirebase()
         this.facts = await getFacts()
-        
-        console.log('Facts store: Fetched facts:', this.facts.length)
       } catch (error) {
-        console.error('Facts store: Error in fetchFacts:', error)
         this.facts = []
       } finally {
         this.isLoading = false
@@ -29,8 +24,6 @@ export const useFactsStore = defineStore('facts', {
     async voteFact(id) {
       this.votingId = id
       try {
-        console.log('Facts store: Starting voteFact for id:', id)
-        
         // Use the composable directly
         const { voteFact } = useFirebase()
         await voteFact(id)
@@ -38,7 +31,6 @@ export const useFactsStore = defineStore('facts', {
         const factIndex = this.facts.findIndex(fact => fact.id === id)
         if (factIndex !== -1) {
           this.facts[factIndex].votes++
-          console.log('Facts store: Updated votes for fact:', id)
         }
         
         // Show success notification if available
@@ -47,8 +39,6 @@ export const useFactsStore = defineStore('facts', {
           notifySuccess('¡Gracias!', 'Tu voto ha sido registrado')
         }
       } catch (error) {
-        console.error('Facts store: Error in voteFact:', error)
-        
         // Show error notification if available
         if (process.client && window.useNotifications) {
           const { notifyError } = useNotifications()

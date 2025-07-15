@@ -6,13 +6,7 @@ export default class FirebaseService {
   constructor() {
     try {
       const { $firebase } = useNuxtApp()
-      console.log('Firebase service constructor - $firebase:', !!$firebase)
-      console.log('Firebase service constructor - $firebase.db:', !!$firebase?.db)
       this.db = $firebase?.db || null
-      
-      if (!this.db) {
-        console.warn('Firebase database not available in service constructor')
-      }
     } catch (error) {
       console.error('Error in Firebase service constructor:', error)
       this.db = null
@@ -27,11 +21,9 @@ export default class FirebaseService {
     }
     
     try {
-      console.log('Fetching facts from Firestore...')
       const factsCollection = collection(this.db, 'funfacts')
       const snapshot = await getDocs(factsCollection)
       const facts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-      console.log('Fetched facts:', facts.length, 'items')
       return facts
     } catch (error) {
       console.error('Error fetching facts:', error)
@@ -46,10 +38,8 @@ export default class FirebaseService {
     }
     
     try {
-      console.log('Voting for fact:', id)
       const factRef = doc(this.db, 'funfacts', id)
       await updateDoc(factRef, { votes: increment(1) })
-      console.log('Vote successful for fact:', id)
     } catch (error) {
       console.error('Error voting for fact:', error)
       throw error

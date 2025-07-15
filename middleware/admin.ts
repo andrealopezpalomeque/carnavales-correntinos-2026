@@ -4,14 +4,28 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
   const { isAuthenticated, isLoading, hasRole } = useAuthEnhanced()
 
-  // Wait for auth state to be determined
+  // If still loading, we need to wait for auth state to be determined
   if (isLoading.value) {
-    return
+    // Return a promise that resolves when auth state is ready
+    return new Promise((resolve) => {
+      const unwatch = watch(isLoading, (loading) => {
+        if (!loading) {
+          unwatch()
+          if (!isAuthenticated.value) {
+            resolve(navigateTo('/auth'))
+          } else if (!hasRole('admin')) {
+            resolve(navigateTo('/?error=insufficient-permissions'))
+          } else {
+            resolve()
+          }
+        }
+      })
+    })
   }
 
   // Check if user is authenticated
   if (!isAuthenticated.value) {
-    return navigateTo('/?error=auth-required')
+    return navigateTo('/auth')
   }
 
   // Check if user has admin role

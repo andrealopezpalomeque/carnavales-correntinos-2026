@@ -17,13 +17,6 @@ export default defineNuxtPlugin((nuxtApp) => {
     appId: config.FIREBASE_APP_ID,
   }
 
-  // Log configuration for debugging (remove sensitive info)
-  console.log('Firebase config loaded:', {
-    hasApiKey: !!firebaseConfig.apiKey,
-    authDomain: firebaseConfig.authDomain,
-    projectId: firebaseConfig.projectId,
-    hasAppId: !!firebaseConfig.appId
-  })
 
   // Check if we have the required config
   if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
@@ -42,7 +35,6 @@ export default defineNuxtPlugin((nuxtApp) => {
     const storage = getStorage(app)
     const auth = getAuth(app)
     
-    console.log('Firebase initialized successfully', { auth: !!auth })
 
     // Note: Auth emulator is disabled for production-like development
     // Uncomment the lines below if you want to use Firebase Auth emulator
@@ -50,7 +42,6 @@ export default defineNuxtPlugin((nuxtApp) => {
     //   try {
     //     connectAuthEmulator(auth, 'http://localhost:9099')
     //   } catch (error) {
-    //     console.warn('Firebase Auth emulator not available:', error)
     //   }
     // }
 

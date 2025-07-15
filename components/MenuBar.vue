@@ -6,17 +6,24 @@
         <div class="flex items-center">
           <div class="flex-shrink-0">
             <!-- Carnival Logo -->
-            <div class="w-12 h-12 bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <span class="text-2xl">🥳</span>
-            </div>
+            <NuxtLink to="/" @click="scrollToTop" class="block">
+              <div class="w-12 h-12 bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer">
+                <span class="text-2xl">🥳</span>
+              </div>
+            </NuxtLink>
           </div>
         </div>
 
         <!-- Desktop Navigation Links -->
         <div v-if="isAuthenticated" class="hidden md:flex items-center space-x-8">
-          <a v-for="section in visibleSections" :key="section.id" :href="`#${section.id}`" class="text-gray-700 hover:text-green-600 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-green-50">
+          <button 
+            v-for="section in visibleSections" 
+            :key="section.id" 
+            @click="scrollToSection(section.id)"
+            class="text-gray-700 hover:text-green-600 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-green-50"
+          >
             {{ section.name }} 
-          </a>
+          </button>
         </div>
 
         <!-- Authentication Section -->
@@ -46,11 +53,11 @@
                 v-if="userProfile?.photoURL || authUser?.photoURL" 
                 :src="userProfile?.photoURL || authUser?.photoURL" 
                 :alt="userDisplayName"
-                class="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
+                class="w-8 h-8 rounded-full object-cover border-2 border-gray-200 aspect-square"
               />
               <div 
                 v-else 
-                class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-medium text-sm"
+                class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-medium text-sm aspect-square"
               >
                 {{ userInitials }}
               </div>
@@ -110,9 +117,15 @@
     <div v-show="mobileMenuOpen" class="md:hidden bg-white border-t border-gray-100">
       <div class="container-standard pt-2 pb-3 space-y-1">
         <!-- Mobile Navigation Links -->
-        <a v-if="isAuthenticated" v-for="section in visibleSections" :key="section.id" :href="`#${section.id}`" @click="closeMobileMenu" class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-4 py-3 rounded-lg text-base font-medium transition-all duration-200">
+        <button 
+          v-if="isAuthenticated" 
+          v-for="section in visibleSections" 
+          :key="section.id" 
+          @click="scrollToSection(section.id); closeMobileMenu()" 
+          class="text-gray-700 hover:text-green-600 hover:bg-green-50 block w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-all duration-200"
+        >
           {{ section.name }}
-        </a>
+        </button>
 
         <!-- Mobile Authentication Section -->
         <div class="pt-4 pb-2">
@@ -133,7 +146,11 @@
 
           <!-- Mobile User Info (when authenticated) -->
           <div v-else class="space-y-3">
-            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg relative">
+            <NuxtLink 
+              to="/profile" 
+              @click="closeMobileMenu()"
+              class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg relative hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
+            >
               <!-- New User Badge -->
               <div v-if="isNewUser" class="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
                 Nuevo
@@ -142,11 +159,11 @@
                 v-if="userProfile?.photoURL || authUser?.photoURL" 
                 :src="userProfile?.photoURL || authUser?.photoURL" 
                 :alt="userDisplayName"
-                class="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
+                class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 aspect-square"
               />
               <div 
                 v-else 
-                class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-medium"
+                class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-medium aspect-square"
               >
                 {{ userInitials }}
               </div>
@@ -154,7 +171,10 @@
                 <p class="text-sm font-medium text-gray-900 truncate">{{ userDisplayName }}</p>
                 <p class="text-xs text-gray-500 truncate break-all">{{ authUser?.email }}</p>
               </div>
-            </div>
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </NuxtLink>
             <button
               @click="handleSignOut"
               :disabled="isLoading"
@@ -173,7 +193,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 
 // Mobile menu state
 const mobileMenuOpen = ref(false)
@@ -215,18 +235,15 @@ const handleSignIn = async () => {
   try {
     const result = await signInWithGoogle()
     if (result.success) {
-      console.log('Usuario autenticado desde MenuBar:', authUser.value)
       notifyAuthSuccess(`¡Bienvenido, ${userDisplayName.value}!`)
       // Optionally close mobile menu if open
       if (mobileMenuOpen.value) {
         closeMobileMenu()
       }
     } else {
-      console.error('Error de autenticación:', result.error)
       notifyAuthError(result.error || 'Error al iniciar sesión')
     }
   } catch (error) {
-    console.error('Error en handleSignIn:', error)
   }
 }
 
@@ -235,19 +252,18 @@ const handleSignOut = async () => {
   try {
     const result = await signOutUser()
     if (result.success) {
-      console.log('Usuario desconectado desde MenuBar')
       notifyLogout()
       userMenuOpen.value = false
       // Optionally close mobile menu if open
       if (mobileMenuOpen.value) {
         closeMobileMenu()
       }
+      // Redirect to main page without hash after logout
+      navigateTo('/')
     } else {
-      console.error('Error al cerrar sesión:', result.error)
       notifyAuthError(result.error || 'Error al cerrar sesión')
     }
   } catch (error) {
-    console.error('Error en handleSignOut:', error)
   }
 }
 
@@ -265,6 +281,32 @@ const visibleSections = computed(() => {
   return sections.filter(section => !section.requiresAuth || isAuthenticated.value)
 })
 
+// Smart navigation - always navigate to home with hash to ensure URL is updated
+const scrollToSection = (sectionId) => {
+  // Always navigate to home with hash to ensure URL is updated consistently
+  navigateTo(`/#${sectionId}`)
+}
+
+// Scroll to top when logo is clicked
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+}
+
+// Watch for authentication state changes
+watch(isAuthenticated, (authenticated, wasAuthenticated) => {
+  if (wasAuthenticated && !authenticated) {
+    // User logged out - redirect to main page without hash
+    const route = useRoute()
+    if (route.path === '/' && route.hash) {
+      // If on home page with hash, remove hash
+      navigateTo('/')
+    }
+  }
+})
+
 // Watch for new users to redirect to setup
 watch([isAuthenticated, isNewUser], ([authenticated, newUser]) => {
   if (authenticated && newUser) {
@@ -272,9 +314,32 @@ watch([isAuthenticated, isNewUser], ([authenticated, newUser]) => {
   }
 })
 
+// Watch for route changes to handle hash scrolling
+watch(() => useRoute().hash, () => {
+  handleHashScroll()
+})
+
+// Handle scroll to hash on page load or navigation
+const handleHashScroll = () => {
+  const route = useRoute()
+  if (route.hash && route.path === '/') {
+    const sectionId = route.hash.substring(1) // Remove the '#'
+    setTimeout(() => {
+      const element = document.getElementById(sectionId)
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        })
+      }
+    }, 500) // Delay to ensure content is loaded
+  }
+}
+
 // Lifecycle hooks
 onMounted(() => {
   document.addEventListener('click', closeUserMenu)
+  handleHashScroll()
 })
 
 onUnmounted(() => {

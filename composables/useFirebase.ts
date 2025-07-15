@@ -15,14 +15,11 @@ export const useFirebase = () => {
     }
     
     try {
-      console.log('useFirebase: Fetching facts from Firestore...')
       const factsCollection = collection($firebase.db, 'funfacts')
       const snapshot = await getDocs(factsCollection)
       const facts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-      console.log('useFirebase: Fetched facts:', facts.length, 'items')
       return facts
     } catch (error) {
-      console.error('useFirebase: Error fetching facts:', error)
       return []
     }
   }
@@ -40,12 +37,9 @@ export const useFirebase = () => {
     }
     
     try {
-      console.log('useFirebase: Voting for fact:', id)
       const factRef = doc($firebase.db, 'funfacts', id)
       await updateDoc(factRef, { votes: increment(1) })
-      console.log('useFirebase: Vote successful for fact:', id)
     } catch (error) {
-      console.error('useFirebase: Error voting for fact:', error)
       if (error.code === 'permission-denied') {
         throw new Error('No tienes permisos para votar')
       }

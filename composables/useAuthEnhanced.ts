@@ -142,7 +142,6 @@ export const useAuthEnhanced = () => {
       authState.userProfile = userProfile
       authState.isNewUser = true
 
-      console.log('Perfil de usuario creado:', userProfile)
       return { success: true, data: userProfile }
     } catch (error: any) {
       console.error('Error creando perfil de usuario:', error)
@@ -182,16 +181,19 @@ export const useAuthEnhanced = () => {
 
   // Actualizar perfil de usuario
   const updateUserProfile = async (updates: UpdateUserProfileData): Promise<AuthResponse> => {
+    
     const { db } = getFirebaseServices()
     if (!db || !authState.authUser) {
       return { success: false, error: 'Firebase o usuario no disponible' }
     }
+
 
     try {
       authState.isProfileLoading = true
       authState.profileError = null
 
       const userDocRef = doc(db, 'users', authState.authUser.uid)
+      
       const updateData = {
         ...updates,
         updatedAt: serverTimestamp()
@@ -209,16 +211,24 @@ export const useAuthEnhanced = () => {
       }
 
       // Log profile update activity
-      await dbService.logUserAction(authState.authUser.uid, 'profile_update', {
-        updatedFields: Object.keys(updates),
-        ...updates
-      })
+      try {
+        await dbService.logUserAction(authState.authUser.uid, 'profile_update', {
+          updatedFields: Object.keys(updates),
+          ...updates
+        })
+      } catch (logError) {
+        console.warn('⚠️ Failed to log user action, but continuing:', logError)
+      }
 
-      console.log('Perfil de usuario actualizado:', updates)
       return { success: true, data: authState.userProfile }
     } catch (error: any) {
-      console.error('Error actualizando perfil de usuario:', error)
-      const errorMessage = 'Error al actualizar perfil de usuario'
+      console.error('💥 Error in updateUserProfile:', error)
+      console.error('Error details:', {
+        code: error.code,
+        message: error.message,
+        stack: error.stack
+      })
+      const errorMessage = `Error al actualizar perfil de usuario: ${error.message || error.code || 'Error desconocido'}`
       authState.profileError = errorMessage
       return { success: false, error: errorMessage }
     } finally {
@@ -262,7 +272,6 @@ export const useAuthEnhanced = () => {
     }
 
     authInitialized = true
-    console.log('Inicializando listener de autenticación Firebase...')
 
     onAuthStateChanged(auth, async (firebaseUser) => {
       authState.isLoading = false
@@ -290,7 +299,6 @@ export const useAuthEnhanced = () => {
           authState.isNewUser = false
           authState.error = getWhitelistErrorMessage()
           
-          console.log('Usuario no autorizado - email no en whitelist')
           return
         }
         
@@ -298,7 +306,6 @@ export const useAuthEnhanced = () => {
         authState.isAuthenticated = true
         authState.error = null
         
-        console.log('Usuario autenticado y autorizado:', authState.authUser)
         
         // Cargar perfil de usuario
         const profile = await getUserProfile(firebaseUser.uid)
@@ -334,7 +341,6 @@ export const useAuthEnhanced = () => {
         authState.isAuthenticated = false
         authState.userProfile = null
         authState.isNewUser = false
-        console.log('Usuario no autenticado')
       }
     }, (error) => {
       console.error('Error en cambio de estado de autenticación:', error)
@@ -360,7 +366,6 @@ export const useAuthEnhanced = () => {
       provider.addScope('email')
       provider.addScope('profile')
 
-      console.log('Iniciando sesión con Google...')
       const result = await signInWithPopup(auth, provider)
       
       if (result.user) {
@@ -387,7 +392,6 @@ export const useAuthEnhanced = () => {
         
         authState.authUser = mapFirebaseUser(result.user)
         authState.isAuthenticated = true
-        console.log('Inicio de sesión con Google exitoso y autorizado:', authState.authUser)
         return { success: true, data: authState.authUser }
       }
       
@@ -453,7 +457,6 @@ export const useAuthEnhanced = () => {
       authState.isAuthenticated = false
       authState.userProfile = null
       authState.isNewUser = false
-      console.log('Cierre de sesión exitoso')
       
       return { success: true }
     } catch (error: any) {

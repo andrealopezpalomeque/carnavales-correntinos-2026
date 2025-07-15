@@ -28,26 +28,40 @@
       </button>
     </div>
 
+    <!-- No Profile State -->
+    <div v-else-if="!userProfile && !isLoading" class="text-center py-8">
+      <p class="text-gray-600 mb-4">No se pudo cargar el perfil</p>
+      <button
+        @click="refreshProfile"
+        class="btn-primary bg-green-600 hover:bg-green-700"
+      >
+        Intentar de nuevo
+      </button>
+    </div>
+
     <!-- Profile Content -->
     <div v-else-if="userProfile">
       <!-- Avatar Section -->
-      <div class="flex items-center mb-6">
-        <AvatarUpload
-          :current-url="userProfile.photoURL"
-          :alt-text="userDisplayName"
-          :initials="userInitials"
-          :user-id="userProfile.uid"
-          :show-edit-button="isEditMode"
-          :show-actions="isEditMode"
-          size="xl"
-          @upload-success="handleAvatarUpload"
-          @upload-error="handleAvatarError"
-          @remove-avatar="handleAvatarRemove"
-        />
+      <div class="flex flex-col sm:flex-row sm:items-start mb-6 space-y-4 sm:space-y-0">
+        <div class="flex-shrink-0 self-center sm:self-start">
+          <div :class="{ 'mb-12': isEditMode }">
+            <AvatarUploadSimple
+              :current-url="userProfile.photoURL"
+              :alt-text="userDisplayName"
+              :initials="userInitials"
+              :show-edit-button="isEditMode"
+              :show-actions="isEditMode"
+              size="lg"
+              @upload-success="handleAvatarUpload"
+              @upload-error="handleAvatarError"
+              @remove-avatar="handleAvatarRemove"
+            />
+          </div>
+        </div>
         
-        <div class="ml-4">
-          <h3 class="text-xl font-semibold text-gray-900">{{ userDisplayName }}</h3>
-          <p class="text-gray-600">{{ userProfile.email }}</p>
+        <div class="sm:ml-4 text-center sm:text-left min-w-0 flex-1">
+          <h3 class="text-xl font-semibold text-gray-900 truncate">{{ userDisplayName }}</h3>
+          <p class="text-gray-600 truncate">{{ userProfile.email }}</p>
           <span 
             v-if="isNewUser"
             class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full mt-1"
@@ -258,7 +272,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import type { UpdateUserProfileData } from '~/types/user'
 
 // Composables
@@ -369,9 +383,9 @@ const refreshProfile = async () => {
   await refreshUserProfile()
 }
 
-const handleAvatarUpload = async (newAvatarUrl: string) => {
+const handleAvatarUpload = async (avatarDataUrl: string) => {
   try {
-    await updateUserProfile({ photoURL: newAvatarUrl })
+    await updateUserProfile({ photoURL: avatarDataUrl })
     notifyAvatarUploaded()
   } catch (error) {
     console.error('Error updating avatar:', error)
@@ -394,20 +408,17 @@ const handleAvatarRemove = async () => {
   }
 }
 
-const formatDate = (date: Date): string => {
-  return date.toLocaleDateString('es-ES', {
+const formatDate = (date: Date | null | undefined): string => {
+  if (!date) return 'No disponible'
+  const dateObj = date instanceof Date ? date : new Date(date)
+  return dateObj.toLocaleDateString('es-ES', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   })
 }
 
-// Check authentication
-onMounted(() => {
-  if (!isAuthenticated.value) {
-    navigateTo('/auth')
-  }
-})
+// Authentication is handled by page middleware
 </script>
 
 <style scoped>

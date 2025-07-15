@@ -47,8 +47,8 @@
     <div v-else class="user-info">
       <div class="user-avatar">
         <img 
-          v-if="user?.photoURL" 
-          :src="user.photoURL" 
+          v-if="authUser?.photoURL" 
+          :src="authUser.photoURL" 
           :alt="userDisplayName"
           class="avatar-img"
         />
@@ -59,7 +59,7 @@
       
       <div class="user-details">
         <p class="user-name">{{ userDisplayName }}</p>
-        <p class="user-email">{{ user?.email }}</p>
+        <p class="user-email">{{ authUser?.email }}</p>
       </div>
 
       <button
@@ -111,7 +111,7 @@ const emit = defineEmits<Emits>()
 
 // Use our auth composable
 const {
-  user,
+  authUser,
   isAuthenticated,
   isLoading,
   error,
@@ -119,7 +119,7 @@ const {
   signOutUser,
   userDisplayName,
   userInitials
-} = useAuth()
+} = useAuthEnhanced()
 
 // Local loading state for this component
 const signingIn = ref(false)
@@ -132,7 +132,7 @@ const handleGoogleSignIn = async () => {
     const result = await signInWithGoogle()
     
     if (result.success) {
-      emit('signInSuccess', user.value)
+      emit('signInSuccess', authUser.value)
     } else {
       emit('signInError', result.error || 'Error al iniciar sesión')
     }
@@ -160,9 +160,9 @@ const handleSignOut = async () => {
 
 // Watch for authentication changes
 watch(isAuthenticated, (newVal) => {
-  if (newVal && user.value) {
+  if (newVal && authUser.value) {
     nextTick(() => {
-      emit('signInSuccess', user.value)
+      emit('signInSuccess', authUser.value)
     })
   }
 })

@@ -41,7 +41,7 @@ service cloud.firestore {
     
     function isValidUserUpdate(data) {
       // Fields that can be updated by user
-      let allowedFields = ['displayName', 'firstName', 'lastName', 'bio', 'preferences', 'photoURL', 'updatedAt', 'lastLoginAt'];
+      let allowedFields = ['displayName', 'firstName', 'lastName', 'bio', 'preferences', 'photoURL', 'updatedAt', 'lastLoginAt', 'isNewUser'];
       
       // Check if only allowed fields are being updated
       return data.diff(resource.data).affectedKeys().hasOnly(allowedFields);

@@ -37,7 +37,14 @@
             </div>
             <h2 class="text-2xl font-bold text-gray-900 mb-4">¡Contenido Exclusivo!</h2>
             <p class="text-gray-600 mb-6">
-              Para acceder a fotos, curiosidades, noticias y playlists del carnaval, necesitas iniciar sesión.
+              Para acceder a fotos, curiosidades, noticias y playlists del carnaval, necesitas 
+              <NuxtLink 
+                to="/auth" 
+                class="font-bold text-green-600 hover:text-green-700 underline hover:no-underline transition-all duration-200 cursor-pointer"
+                aria-label="Iniciar sesión para acceder al contenido exclusivo"
+              >
+                iniciar sesión
+              </NuxtLink>.
             </p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 max-w-4xl mx-auto">
               <div class="flex items-center gap-4 bg-white/60 backdrop-blur-sm rounded-full px-6 py-4 border border-green-200">

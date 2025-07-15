@@ -128,7 +128,12 @@ const images = ref([
     title: 'Celebrando en cada rincón',
     description: 'La alegría del carnaval en su máxima expresión',
     width: 1152,
-    height: 768
+    height: 768,
+    backgroundPosition: {
+      mobile: '-64px',
+      tablet: 'center',
+      desktop: 'center'
+    }
   },
   {
     basename: 'carnaval5',
@@ -164,7 +169,12 @@ const images = ref([
     title: 'Probando la AVENIDA',
     description: '2026?',
     width: 1152,
-    height: 768
+    height: 768,
+    backgroundPosition: {
+      mobile: '-14px',
+      tablet: 'center',
+      desktop: 'center'
+    }
   },
   {
     basename: 'carnaval9',
@@ -205,7 +215,12 @@ const images = ref([
     title: 'CORSITO? SIEMPRE',
     description: '💙🧡',
     width: 1152,
-    height: 768
+    height: 768,
+    backgroundPosition: {
+      mobile: '-14px',
+      tablet: 'center',
+      desktop: 'center'
+    }
   }
 ])
 
@@ -280,7 +295,7 @@ const goToSlide = (index) => {
 // Auto-play functionality
 const startAutoPlay = () => {
   if (autoPlayInterval) clearInterval(autoPlayInterval)
-  autoPlayInterval = setInterval(nextSlide, 4000) // Change slide every 4 seconds
+  autoPlayInterval = setInterval(nextSlide, 8000) // Change slide every 8 seconds
 }
 
 const stopAutoPlay = () => {

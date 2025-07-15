@@ -30,8 +30,11 @@
           <img
             :src="image.src"
             :alt="image.alt"
-            class="w-full h-full object-cover"
-            :style="{ objectPosition: getObjectPosition(image) }"
+            class="w-full h-full object-cover transition-all duration-300"
+            :style="{ 
+              objectPosition: getObjectPosition(image),
+              objectFit: 'cover'
+            }"
             loading="lazy"
             :width="image.width"
             :height="image.height"
@@ -129,8 +132,8 @@ const images = ref([
     description: 'La alegría del carnaval en su máxima expresión',
     width: 1152,
     height: 768,
-    backgroundPosition: {
-      mobile: '-64px',
+    objectPosition: {
+      mobile: '35% center',
       tablet: 'center',
       desktop: 'center'
     }
@@ -170,8 +173,8 @@ const images = ref([
     description: '2026?',
     width: 1152,
     height: 768,
-    backgroundPosition: {
-      mobile: '-14px',
+    objectPosition: {
+      mobile: '45% center',
       tablet: 'center',
       desktop: 'center'
     }
@@ -193,10 +196,10 @@ const images = ref([
     description: '💙🧡',
     width: 1152,
     height: 768,
-    backgroundPosition: {
+    objectPosition: {
       mobile: 'center',
-      tablet: '10px -132px',
-      desktop: '10px -132px'
+      tablet: '52% 20%',
+      desktop: '52% 20%'
     }
   },
   {
@@ -216,8 +219,8 @@ const images = ref([
     description: '💙🧡',
     width: 1152,
     height: 768,
-    backgroundPosition: {
-      mobile: '-14px',
+    objectPosition: {
+      mobile: '45% center',
       tablet: 'center',
       desktop: 'center'
     }
@@ -226,27 +229,50 @@ const images = ref([
 
 // Screen size detection
 const screenWidth = ref(0)
+const containerWidth = ref(0)
 
 const updateScreenWidth = () => {
   screenWidth.value = window.innerWidth
+  // Also update container width for more precise positioning
+  const container = document.querySelector('.relative.w-full')
+  if (container) {
+    containerWidth.value = container.offsetWidth
+  }
 }
 
-// Computed property for responsive object position
+// Enhanced responsive object position with container-relative positioning
 const getObjectPosition = (image) => {
-  if (!image.backgroundPosition) return 'center'
+  if (!image.objectPosition) return 'center'
   
-  // Apply custom position only on desktop (lg screens and up)
+  // Apply custom position based on screen size
   if (screenWidth.value >= 1024) {
-    return image.backgroundPosition.desktop || image.backgroundPosition
+    return image.objectPosition.desktop || 'center'
   }
   
   // Apply tablet-specific position
   if (screenWidth.value >= 768) {
-    return image.backgroundPosition.tablet || 'center'
+    return image.objectPosition.tablet || 'center'
   }
   
   // Mobile fallback
-  return image.backgroundPosition.mobile || 'center'
+  return image.objectPosition.mobile || 'center'
+}
+
+// Additional helper for dynamic positioning based on container size
+const getDynamicPosition = (basePosition, screenSize) => {
+  // Convert percentage-based positions to be more responsive
+  if (typeof basePosition === 'string' && basePosition.includes('%')) {
+    const [x, y] = basePosition.split(' ')
+    
+    // Adjust positioning based on screen width ratio
+    const widthRatio = screenWidth.value / 1152 // Base width
+    const adjustedX = x.includes('%') ? 
+      `${Math.max(0, Math.min(100, parseFloat(x) * widthRatio))}%` : x
+    
+    return `${adjustedX} ${y || 'center'}`
+  }
+  
+  return basePosition
 }
 
 // Carousel state
@@ -356,12 +382,21 @@ const handleSwipe = () => {
   }
 }
 
+// Throttled resize handler for better performance
+let resizeTimeout = null
+const throttledUpdateScreenWidth = () => {
+  if (resizeTimeout) clearTimeout(resizeTimeout)
+  resizeTimeout = setTimeout(() => {
+    updateScreenWidth()
+  }, 100)
+}
+
 // Lifecycle hooks
 onMounted(() => {
   checkWebPSupport()
   startAutoPlay()
   updateScreenWidth()
-  window.addEventListener('resize', updateScreenWidth)
+  window.addEventListener('resize', throttledUpdateScreenWidth)
   document.addEventListener('keydown', handleKeydown)
   document.addEventListener('touchstart', handleTouchStart)
   document.addEventListener('touchend', handleTouchEnd)
@@ -369,7 +404,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   stopAutoPlay()
-  window.removeEventListener('resize', updateScreenWidth)
+  if (resizeTimeout) clearTimeout(resizeTimeout)
+  window.removeEventListener('resize', throttledUpdateScreenWidth)
   document.removeEventListener('keydown', handleKeydown)
   document.removeEventListener('touchstart', handleTouchStart)
   document.removeEventListener('touchend', handleTouchEnd)
@@ -386,5 +422,47 @@ onUnmounted(() => {
 .carousel-enter-from,
 .carousel-leave-to {
   opacity: 0;
+}
+
+/* Enhanced responsive image positioning */
+img {
+  min-width: 100%;
+  min-height: 100%;
+  max-width: none;
+  display: block;
+}
+
+/* Prevent black spaces on ultra-wide screens */
+@media (min-width: 1920px) {
+  img {
+    transform: scale(1.1);
+  }
+}
+
+/* Ensure proper scaling on mobile devices */
+@media (max-width: 768px) {
+  img {
+    object-fit: cover !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 769px) and (max-width: 1023px) {
+  img {
+    object-fit: cover !important;
+    min-width: 100%;
+    min-height: 100%;
+  }
+}
+
+/* Desktop optimizations */
+@media (min-width: 1024px) {
+  img {
+    object-fit: cover !important;
+    min-width: 100%;
+    min-height: 100%;
+  }
 }
 </style>

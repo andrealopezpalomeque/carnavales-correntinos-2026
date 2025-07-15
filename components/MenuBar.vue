@@ -47,7 +47,16 @@
 
           <!-- User Menu (when authenticated) -->
           <div v-else class="relative" ref="userMenuRef">
+            <!-- Loading state for user data -->
+            <div v-if="!isUserDataReady" class="flex items-center gap-2 p-2">
+              <div class="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
+              <div class="hidden lg:block w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
+              <div class="w-4 h-4 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+            
+            <!-- User menu button when data is ready -->
             <button 
+              v-else
               @click="userMenuOpen = !userMenuOpen"
               class="flex items-center gap-2 text-gray-700 hover:text-green-600 focus:outline-none focus:text-green-600 transition-colors duration-200 p-2"
               :aria-expanded="userMenuOpen"
@@ -55,8 +64,8 @@
               aria-label="Abrir menú de usuario"
             >
               <img 
-                v-if="userProfile?.photoURL || authUser?.photoURL" 
-                :src="userProfile?.photoURL || authUser?.photoURL" 
+                v-if="userProfile?.photoURL" 
+                :src="userProfile.photoURL" 
                 :alt="userDisplayName"
                 class="w-8 h-8 rounded-full object-cover border-2 border-gray-200 aspect-square"
               />
@@ -74,7 +83,7 @@
 
             <!-- User Dropdown Menu -->
             <div 
-              v-show="userMenuOpen"
+              v-show="userMenuOpen && isUserDataReady"
               class="absolute right-0 mt-2 w-64 max-w-xs bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
             >
               <div class="px-4 py-2 border-b border-gray-100 relative">
@@ -157,7 +166,18 @@
 
           <!-- Mobile User Info (when authenticated) -->
           <div v-else class="space-y-3">
+            <!-- Loading state for mobile user data -->
+            <div v-if="!isUserDataReady" class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <div class="w-10 h-10 rounded-full bg-gray-200 animate-pulse"></div>
+              <div class="flex-1 min-w-0">
+                <div class="w-32 h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
+                <div class="w-24 h-3 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            </div>
+            
+            <!-- Mobile user profile link when data is ready -->
             <NuxtLink 
+              v-else
               to="/profile" 
               @click="closeMobileMenu()"
               class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg relative hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
@@ -167,8 +187,8 @@
                 Nuevo
               </div>
               <img 
-                v-if="userProfile?.photoURL || authUser?.photoURL" 
-                :src="userProfile?.photoURL || authUser?.photoURL" 
+                v-if="userProfile?.photoURL" 
+                :src="userProfile.photoURL" 
                 :alt="userDisplayName"
                 class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 aspect-square"
               />
@@ -220,11 +240,17 @@ const {
   isAuthenticated,
   isLoading,
   isNewUser,
+  isProfileLoading,
   signInWithGoogle,
   signOutUser,
   userDisplayName,
   userInitials
 } = useAuthEnhanced()
+
+// Wait for profile to load before showing user data
+const isUserDataReady = computed(() => {
+  return isAuthenticated.value && !isProfileLoading.value && userProfile.value
+})
 
 // Notifications
 const { notifyAuthSuccess, notifyAuthError, notifyLogout } = useNotifications()

@@ -37,23 +37,23 @@
         <div 
           v-for="n in 3" 
           :key="n"
-          class="bg-gray-900 rounded-2xl overflow-hidden animate-pulse shadow-2xl"
+          class="bg-white rounded-2xl overflow-hidden animate-pulse shadow-lg border border-gray-200"
         >
           <!-- Cover area placeholder -->
-          <div class="h-48 bg-gray-700 flex items-center justify-center">
-            <div class="w-20 h-20 bg-gray-600 rounded-lg"></div>
+          <div class="h-48 bg-gray-200 flex items-center justify-center">
+            <div class="w-20 h-20 bg-gray-300 rounded-lg"></div>
           </div>
           <!-- Content area placeholder -->
           <div class="p-6">
-            <div class="h-6 bg-gray-700 rounded mb-3 w-3/4"></div>
-            <div class="h-4 bg-gray-700 rounded mb-2 w-full"></div>
-            <div class="h-4 bg-gray-700 rounded mb-4 w-2/3"></div>
+            <div class="h-6 bg-gray-200 rounded mb-3 w-3/4"></div>
+            <div class="h-4 bg-gray-200 rounded mb-2 w-full"></div>
+            <div class="h-4 bg-gray-200 rounded mb-4 w-2/3"></div>
             <div class="flex justify-between">
-              <div class="h-3 bg-gray-700 rounded w-16"></div>
+              <div class="h-3 bg-gray-200 rounded w-16"></div>
               <div class="flex gap-1">
-                <div class="w-2 h-2 bg-gray-700 rounded-full"></div>
-                <div class="w-2 h-2 bg-gray-700 rounded-full"></div>
-                <div class="w-2 h-2 bg-gray-700 rounded-full"></div>
+                <div class="w-2 h-2 bg-gray-200 rounded-full"></div>
+                <div class="w-2 h-2 bg-gray-200 rounded-full"></div>
+                <div class="w-2 h-2 bg-gray-200 rounded-full"></div>
               </div>
             </div>
           </div>
@@ -65,7 +65,7 @@
         <div
           v-for="(playlist, index) in playlists.slice(0, 3)"
           :key="playlist.id"
-          class="group relative bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-2xl overflow-hidden hover:from-gray-800 hover:to-gray-900 transition-all duration-500 cursor-pointer shadow-2xl hover:shadow-green-500/20 hover:scale-105"
+          class="group relative bg-white rounded-2xl overflow-hidden hover:bg-gray-50 transition-all duration-500 cursor-pointer shadow-lg hover:shadow-green-500/20 hover:scale-105 border border-gray-200 hover:border-green-300"
           :style="{ animationDelay: `${index * 200}ms` }"
           @click="openPlaylist(playlist.url)"
         >
@@ -91,10 +91,10 @@
 
           <!-- Track Info -->
           <div class="p-6">
-            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-green-400 transition-colors duration-300 line-clamp-1">
+            <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-green-600 transition-colors duration-300 line-clamp-1">
               {{ playlist.name }}
             </h3>
-            <p class="text-gray-400 text-sm mb-4 line-clamp-2 leading-relaxed">
+            <p class="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
               {{ playlist.description }}
             </p>
             
@@ -148,20 +148,20 @@
         v-if="!isLoading && playlists.length > 0"
         class="mt-20 text-center"
       >
-        <div class="inline-flex items-center gap-6 bg-gray-900/90 backdrop-blur-sm border border-gray-700/50 rounded-2xl px-8 py-6 shadow-lg">
+        <div class="inline-flex items-center gap-6 bg-white/70 backdrop-blur-sm border border-gray-200/50 rounded-2xl px-8 py-6 shadow-lg">
           <div class="text-center">
-            <div class="text-3xl font-bold text-green-400 mb-1">3</div>
-            <div class="text-sm text-gray-400">Playlists</div>
+            <div class="text-3xl font-bold text-green-600 mb-1">3</div>
+            <div class="text-sm text-gray-600">Playlists</div>
           </div>
-          <div class="w-px h-12 bg-gray-600"></div>
+          <div class="w-px h-12 bg-gray-200"></div>
           <div class="text-center">
-            <div class="text-3xl font-bold text-emerald-400 mb-1">{{ getDisplayedTracks() }}</div>
-            <div class="text-sm text-gray-400">Canciones</div>
+            <div class="text-3xl font-bold text-emerald-600 mb-1">{{ getDisplayedTracks() }}</div>
+            <div class="text-sm text-gray-600">Canciones</div>
           </div>
-          <div class="w-px h-12 bg-gray-600"></div>
+          <div class="w-px h-12 bg-gray-200"></div>
           <div class="text-center">
-            <div class="text-3xl font-bold text-green-400 mb-1">{{ getDisplayedHours() }}h</div>
-            <div class="text-sm text-gray-400">Duración</div>
+            <div class="text-3xl font-bold text-green-600 mb-1">{{ getDisplayedHours() }}h</div>
+            <div class="text-sm text-gray-600">Duración</div>
           </div>
         </div>
       </div>
@@ -440,12 +440,12 @@ onMounted(() => {
 }
 
 /* Card content transitions */
-.group .text-white {
+.group .text-gray-800 {
   transition: color 0.3s ease;
 }
 
-.group:hover .text-white {
-  color: #1ed760;
+.group:hover .text-gray-800 {
+  color: #16a34a;
 }
 
 /* Play button scaling animation */
@@ -467,13 +467,13 @@ onMounted(() => {
   }
 }
 
-/* Dark theme scrollbar */
+/* Light theme scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #121212;
+  background: #f8f9fa;
   border-radius: 4px;
 }
 

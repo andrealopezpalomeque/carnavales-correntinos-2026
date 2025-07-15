@@ -1,14 +1,14 @@
 <template>
-  <nav class="bg-white shadow-md border-b border-gray-100 sticky top-0 z-50">
+  <nav class="bg-white shadow-md border-b border-gray-100 sticky top-0 z-50" role="navigation" aria-label="Navegación principal">
     <div class="container-standard">
       <div class="flex justify-between items-center h-16">
         <!-- Logo Section -->
         <div class="flex items-center">
           <div class="flex-shrink-0">
             <!-- Carnival Logo -->
-            <NuxtLink to="/" @click="scrollToTop" class="block">
+            <NuxtLink to="/" @click="scrollToTop" class="block" aria-label="Ir al inicio">
               <div class="w-12 h-12 bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer">
-                <span class="text-2xl">🥳</span>
+                <span class="text-2xl" aria-hidden="true">🥳</span>
               </div>
             </NuxtLink>
           </div>
@@ -21,6 +21,7 @@
             :key="section.id" 
             @click="scrollToSection(section.id)"
             class="text-gray-700 hover:text-green-600 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-green-50"
+            :aria-label="`Ir a sección ${section.name}`"
           >
             {{ section.name }} 
           </button>
@@ -35,6 +36,7 @@
             :disabled="isLoading"
             class="btn-primary bg-green-600 text-white hover:bg-green-700 text-sm flex items-center gap-2"
             :class="{ 'opacity-70 cursor-not-allowed': isLoading }"
+            :aria-label="isLoading ? 'Cargando...' : 'Iniciar sesión con Google'"
           >
             <svg v-if="isLoading" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
@@ -48,6 +50,9 @@
             <button 
               @click="userMenuOpen = !userMenuOpen"
               class="flex items-center gap-2 text-gray-700 hover:text-green-600 focus:outline-none focus:text-green-600 transition-colors duration-200 p-2"
+              :aria-expanded="userMenuOpen"
+              aria-haspopup="true"
+              aria-label="Abrir menú de usuario"
             >
               <img 
                 v-if="userProfile?.photoURL || authUser?.photoURL" 
@@ -103,8 +108,14 @@
 
         <!-- Mobile menu button -->
         <div class="md:hidden">
-          <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-700 hover:text-green-600 focus:outline-none focus:text-green-600 transition-colors duration-200 p-2">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <button 
+            @click="mobileMenuOpen = !mobileMenuOpen" 
+            class="text-gray-700 hover:text-green-600 focus:outline-none focus:text-green-600 transition-colors duration-200 p-2"
+            :aria-expanded="mobileMenuOpen"
+            aria-controls="mobile-menu"
+            :aria-label="mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'"
+          >
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path v-if="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
               <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -114,7 +125,7 @@
     </div>
 
     <!-- Mobile menu -->
-    <div v-show="mobileMenuOpen" class="md:hidden bg-white border-t border-gray-100">
+    <div v-show="mobileMenuOpen" id="mobile-menu" class="md:hidden bg-white border-t border-gray-100">
       <div class="container-standard pt-2 pb-3 space-y-1">
         <!-- Mobile Navigation Links -->
         <button 

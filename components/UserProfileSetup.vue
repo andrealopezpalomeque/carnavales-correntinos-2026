@@ -51,27 +51,33 @@
         </div>
 
         <!-- Setup Form -->
-        <form @submit.prevent="completeSetup" class="space-y-4">
+        <form @submit.prevent="completeSetup" class="space-y-4" aria-labelledby="setup-form-heading">
+          <h3 id="setup-form-heading" class="sr-only">Formulario de configuración de perfil</h3>
           <!-- Display Name -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label for="display-name" class="block text-sm font-medium text-gray-700 mb-1">
               Nombre para mostrar *
             </label>
             <input
+              id="display-name"
               v-model="formData.displayName"
               type="text"
               required
+              aria-required="true"
+              aria-describedby="display-name-help"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="¿Cómo te gusta que te llamen?"
             />
+            <p id="display-name-help" class="sr-only">Este será el nombre que otros usuarios vean</p>
           </div>
 
           <!-- First Name -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label for="first-name" class="block text-sm font-medium text-gray-700 mb-1">
               Nombre
             </label>
             <input
+              id="first-name"
               v-model="formData.firstName"
               type="text"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -81,10 +87,11 @@
 
           <!-- Last Name -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label for="last-name" class="block text-sm font-medium text-gray-700 mb-1">
               Apellido
             </label>
             <input
+              id="last-name"
               v-model="formData.lastName"
               type="text"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"

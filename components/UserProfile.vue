@@ -1,11 +1,12 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
+  <div class="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto" role="main" aria-labelledby="profile-heading">
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-bold text-gray-900">Mi Perfil</h2>
+      <h2 id="profile-heading" class="text-2xl font-bold text-gray-900">Mi Perfil</h2>
       <button
         @click="toggleEditMode"
         class="btn-secondary text-sm"
         :disabled="isLoading"
+        :aria-label="isEditMode ? 'Cancelar edición de perfil' : 'Editar perfil'"
       >
         {{ isEditMode ? 'Cancelar' : 'Editar' }}
       </button>
@@ -13,7 +14,7 @@
 
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center py-8">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600" aria-hidden="true"></div>
       <span class="ml-2 text-gray-600">Cargando perfil...</span>
     </div>
 
@@ -23,6 +24,7 @@
       <button
         @click="refreshProfile"
         class="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+        aria-label="Reintentar carga del perfil"
       >
         Reintentar
       </button>
@@ -34,6 +36,7 @@
       <button
         @click="refreshProfile"
         class="btn-primary bg-green-600 hover:bg-green-700"
+        aria-label="Intentar cargar el perfil nuevamente"
       >
         Intentar de nuevo
       </button>

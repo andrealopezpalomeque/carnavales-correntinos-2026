@@ -1,10 +1,12 @@
 <template>
   <div class="container-standard pb-6">
-    <div class="relative w-full h-96 md:h-[500px] lg:h-[600px] overflow-hidden bg-gray-900 rounded-xl shadow-lg">
+    <div class="relative w-full h-96 md:h-[500px] lg:h-[600px] overflow-hidden bg-gray-900 rounded-xl shadow-lg" role="img" aria-live="polite" aria-label="Carrusel de fotos del carnaval">
     <!-- Carousel Images -->
     <div 
       class="flex transition-transform duration-500 ease-in-out h-full"
       :style="{ transform: `translateX(-${currentSlide * 100}%)` }"
+      role="group"
+      :aria-label="`Imagen ${currentSlide + 1} de ${images.length}`"
     >
       <div
         v-for="(image, index) in images"
@@ -33,7 +35,7 @@
       class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full transition-all duration-200 backdrop-blur-sm"
       aria-label="Previous image"
     >
-      <ChevronLeft class="w-6 h-6" />
+      <ChevronLeft class="w-6 h-6" aria-hidden="true" />
     </button>
     
     <button
@@ -41,7 +43,7 @@
       class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full transition-all duration-200 backdrop-blur-sm"
       aria-label="Next image"
     >
-      <ChevronRight class="w-6 h-6" />
+      <ChevronRight class="w-6 h-6" aria-hidden="true" />
     </button>
 
     <!-- Dot Indicators -->
@@ -62,8 +64,8 @@
       class="absolute top-4 right-4 bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full transition-all duration-200 backdrop-blur-sm"
       :aria-label="isPlaying ? 'Pause slideshow' : 'Play slideshow'"
     >
-      <Pause v-if="isPlaying" class="w-5 h-5" />
-      <Play v-else class="w-5 h-5" />
+      <Pause v-if="isPlaying" class="w-5 h-5" aria-hidden="true" />
+      <Play v-else class="w-5 h-5" aria-hidden="true" />
     </button>
     </div>
   </div>

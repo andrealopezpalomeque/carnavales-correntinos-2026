@@ -12,7 +12,7 @@
         <!-- Loading State -->
         <div v-if="isLoading" class="min-h-[60vh] flex flex-col items-center justify-center">
           <div class="flex items-center justify-center gap-3 text-gray-600">
-            <svg class="animate-spin h-8 w-8" fill="none" viewBox="0 0 24 24">
+            <svg class="animate-spin h-8 w-8" fill="none" viewBox="0 0 24 24" aria-hidden="true">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
             </svg>
@@ -23,7 +23,7 @@
       <!-- Content when not loading -->
       <div v-else>
         <!-- Countdown - Always visible -->
-        <section id="countdown" class="section-compact min-h-[60vh] flex flex-col items-center justify-center">
+        <section id="countdown" class="section-compact min-h-[60vh] flex flex-col items-center justify-center" aria-labelledby="countdown-heading">
           <Countdown />
         </section>
 
@@ -31,7 +31,7 @@
         <section v-if="!isAuthenticated" class="min-h-[40vh] flex flex-col items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50">
           <div class="w-full mx-auto text-center p-8 container-standard">
             <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
               </svg>
             </div>
@@ -73,16 +73,19 @@
 
         <!-- Protected Content - Only for Authenticated Users -->
         <template v-if="isAuthenticated">
-          <section id="photos" class="min-h-[30vh] flex flex-col items-center justify-center">
+          <section id="photos" class="min-h-[30vh] flex flex-col items-center justify-center" aria-labelledby="photos-heading">
+            <h2 id="photos-heading" class="sr-only">Galería de fotos</h2>
             <Gallery/>
           </section>
-          <section id="fun-facts" class="min-h-[30vh] flex flex-col items-center justify-center">
+          <section id="fun-facts" class="min-h-[30vh] flex flex-col items-center justify-center" aria-labelledby="fun-facts-heading">
             <FunFacts/>
           </section>
-          <section id="related-news" class="min-h-[30vh] flex flex-col items-center justify-center">
+          <section id="related-news" class="min-h-[30vh] flex flex-col items-center justify-center" aria-labelledby="news-heading">
+            <h2 id="news-heading" class="sr-only">Noticias relacionadas</h2>
             <RelatedNews/>
           </section>
-          <section id="spotify-playlists" class="min-h-[30vh] flex flex-col items-center justify-center">
+          <section id="spotify-playlists" class="min-h-[30vh] flex flex-col items-center justify-center" aria-labelledby="playlists-heading">
+            <h2 id="playlists-heading" class="sr-only">Playlists de Spotify</h2>
             <SpotifyPlaylists />
           </section>
         </template>

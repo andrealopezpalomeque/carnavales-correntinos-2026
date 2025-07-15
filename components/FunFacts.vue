@@ -1,5 +1,5 @@
 <template>
-  <section id="fun-facts" class="section-standard bg-gradient-to-br from-green-50 to-emerald-50 min-h-screen">
+  <section id="fun-facts" class="section-standard bg-gradient-to-br from-green-50 to-emerald-50 min-h-screen" aria-labelledby="fun-facts-heading">
     <div class="container-standard">
       <!-- Header with modern style -->
       <div class="text-center mb-16">
@@ -8,7 +8,7 @@
           <span class="px-6 text-6xl">🎭</span>
           <div class="h-px bg-gradient-to-r from-transparent via-green-400 to-transparent flex-1"></div>
         </div>
-        <h2 class="text-5xl font-bold bg-gradient-to-r from-green-600 via-emerald-500 to-green-700 bg-clip-text text-transparent mb-4">
+        <h2 id="fun-facts-heading" class="text-5xl font-bold bg-gradient-to-r from-green-600 via-emerald-500 to-green-700 bg-clip-text text-transparent mb-4">
           Curiosidades del Carnaval
         </h2>
         <p class="text-gray-600 text-xl max-w-3xl mx-auto leading-relaxed">
@@ -90,7 +90,7 @@
                   <!-- Vote Display -->
                   <div class="flex items-center space-x-3">
                     <div class="flex items-center bg-white rounded-full px-4 py-2 shadow-sm">
-                      <svg class="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <svg class="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                         <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
                       </svg>
                       <span class="text-sm font-bold text-gray-700">{{ fact.votes }}</span>
@@ -109,8 +109,9 @@
                       <span 
                         v-if="factsStore.votingId === fact.id"
                         class="inline-block animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                        aria-hidden="true"
                       ></span>
-                      <span v-else class="text-xl">👍</span>
+                      <span v-else class="text-xl" aria-hidden="true">👍</span>
                       <span class="text-sm font-medium">
                         {{ factsStore.votingId === fact.id ? 'Votando...' : '¡Me gusta!' }}
                       </span>

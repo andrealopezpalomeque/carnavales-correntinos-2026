@@ -258,11 +258,11 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div>
             <span class="text-gray-600">Miembro desde:</span>
-            <p class="font-medium">{{ formatDate(userProfile.createdAt) }}</p>
+            <p class="font-medium">{{ formatCreationDate() }}</p>
           </div>
           <div>
             <span class="text-gray-600">Último acceso:</span>
-            <p class="font-medium">{{ formatDate(userProfile.lastLoginAt) }}</p>
+            <p class="font-medium">{{ formatLastSignInDate() }}</p>
           </div>
           <div>
             <span class="text-gray-600">Rol:</span>
@@ -298,6 +298,10 @@ const {
   notifySuccess,
   notifyError 
 } = useNotifications()
+
+// Get Firebase auth user for lastSignInTime and creationTime
+const { $firebase } = useNuxtApp()
+const authUser = computed(() => $firebase?.auth?.currentUser)
 
 // Local state
 const isEditMode = ref(false)
@@ -411,15 +415,72 @@ const handleAvatarRemove = async () => {
   }
 }
 
-const formatDate = (date: Date | null | undefined): string => {
-  if (!date) return 'No disponible'
-  const dateObj = date instanceof Date ? date : new Date(date)
-  return dateObj.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
+// Date formatting functions using Firebase Auth metadata
+const formatCreationDate = (): string => {
+  // First try Firebase Auth creationTime, then fallback to userProfile createdAt
+  if (authUser.value?.metadata?.creationTime) {
+    try {
+      const date = new Date(authUser.value.metadata.creationTime)
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleDateString('es-ES', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      }
+    } catch (error) {
+      console.error('Error formatting creation date from auth:', error)
+    }
+  }
+  
+  // Fallback to userProfile createdAt
+  if (userProfile.value?.createdAt) {
+    try {
+      const date = userProfile.value.createdAt instanceof Date 
+        ? userProfile.value.createdAt 
+        : new Date(userProfile.value.createdAt)
+      
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleDateString('es-ES', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      }
+    } catch (error) {
+      console.error('Error formatting creation date from profile:', error)
+    }
+  }
+  
+  return 'No disponible'
 }
+
+const formatLastSignInDate = (): string => {
+  if (!authUser.value?.metadata?.lastSignInTime) return 'Nunca'
+  
+  try {
+    // Firebase Auth provides lastSignInTime as an ISO string
+    const date = new Date(authUser.value.metadata.lastSignInTime)
+    
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid lastSignInTime:', authUser.value.metadata.lastSignInTime)
+      return 'Fecha no disponible'
+    }
+    
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  } catch (error) {
+    console.error('Error formatting last sign in date:', error)
+    return 'Error en fecha'
+  }
+}
+
+// Legacy formatDate function (removed, replaced with specific functions above)
 
 // Authentication is handled by page middleware
 </script>

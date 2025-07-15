@@ -10,65 +10,45 @@
       <!-- Profile Component -->
       <UserProfile />
 
-      <!-- Additional Profile Sections -->
-      <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Activity Summary -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Resumen de Actividad</h3>
-          <div class="space-y-3">
-            <div class="flex justify-between items-center">
-              <span class="text-gray-600">Días como miembro:</span>
-              <span class="font-medium">{{ membershipDays }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-gray-600">Último acceso:</span>
-              <span class="font-medium">{{ lastLoginFormatted }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-gray-600">Estado de la cuenta:</span>
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                    :class="userProfile?.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-                {{ userProfile?.isActive ? 'Activa' : 'Inactiva' }}
-              </span>
-            </div>
+      <!-- Activity Summary -->
+      <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Resumen de Actividad</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+          <div class="text-center">
+            <div class="text-2xl font-bold text-green-600">{{ membershipDays }}</div>
+            <div class="text-sm text-gray-600">Días como miembro</div>
+          </div>
+          <div class="text-center">
+            <div class="text-sm font-medium text-gray-900">{{ lastLoginFormatted }}</div>
+            <div class="text-sm text-gray-600">Último acceso</div>
+          </div>
+          <div class="text-center">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                  :class="userProfile?.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+              {{ userProfile?.isActive ? 'Activa' : 'Inactiva' }}
+            </span>
+            <div class="text-sm text-gray-600 mt-1">Estado de la cuenta</div>
           </div>
         </div>
-
-        <!-- Quick Actions -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
-          <div class="space-y-3">
+        
+        <!-- New User Setup Notice -->
+        <div v-if="isNewUser" class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <h4 class="text-sm font-medium text-blue-900">Completa tu configuración</h4>
+              <p class="text-sm text-blue-700 mt-1">Personaliza tu perfil para una mejor experiencia</p>
+            </div>
             <NuxtLink 
               to="/profile/setup" 
-              class="block w-full btn-secondary text-center"
-              v-if="isNewUser"
+              class="ml-4 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
             >
-              Completar Configuración
+              Completar
             </NuxtLink>
-            
-            <button 
-              @click="downloadProfileData"
-              class="w-full btn-secondary"
-              :disabled="isDownloading"
-            >
-              <svg v-if="isDownloading" class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-              </svg>
-              {{ isDownloading ? 'Descargando...' : 'Descargar mis datos' }}
-            </button>
-            
-            <button 
-              @click="refreshProfileData"
-              class="w-full btn-secondary"
-              :disabled="isRefreshing"
-            >
-              <svg v-if="isRefreshing" class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-              </svg>
-              {{ isRefreshing ? 'Actualizando...' : 'Actualizar datos' }}
-            </button>
           </div>
         </div>
       </div>
@@ -111,6 +91,28 @@
             </button>
           </div>
         </div>
+      </div>
+
+      <!-- Data Management -->
+      <div class="mt-8 bg-gray-50 border border-gray-200 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Gestión de Datos</h3>
+        <p class="text-sm text-gray-600 mb-4">
+          Descarga una copia de todos tus datos almacenados en la plataforma.
+        </p>
+        <button 
+          @click="downloadProfileData"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 text-sm flex items-center gap-2"
+          :disabled="isDownloading"
+        >
+          <svg v-if="isDownloading" class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+          </svg>
+          <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          {{ isDownloading ? 'Descargando...' : 'Descargar mis datos' }}
+        </button>
       </div>
 
       <!-- Danger Zone -->
@@ -201,7 +203,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 // Page meta
 definePageMeta({
@@ -220,36 +222,131 @@ const {
   userProfile, 
   isAuthenticated, 
   isNewUser,
-  updateUserProfile,
-  refreshUserProfile 
+  updateUserProfile 
 } = useAuthEnhanced()
+
+// Get Firebase auth user for lastSignInTime
+const { $firebase } = useNuxtApp()
+const authUser = computed(() => $firebase?.auth?.currentUser)
 
 // Local state
 const isDownloading = ref(false)
-const isRefreshing = ref(false)
 const isDeletingAccount = ref(false)
 const showDeleteConfirmation = ref(false)
 const deleteConfirmationText = ref('')
 const showDeactivateModal = ref(false)
 const isDeactivating = ref(false)
 
-// Computed properties
-const membershipDays = computed(() => {
-  if (!userProfile.value?.createdAt) return 0
-  const diffTime = Math.abs(new Date() - new Date(userProfile.value.createdAt))
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-})
+// Reactive values for dates to avoid initial undefined issues
+const membershipDays = ref(0)
+const lastLoginFormatted = ref('Cargando...')
 
-const lastLoginFormatted = computed(() => {
-  if (!userProfile.value?.lastLoginAt) return 'Nunca'
-  return new Date(userProfile.value.lastLoginAt).toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-})
+// Helper function to safely convert various date formats to Date object
+const parseDate = (rawDate: any): Date | null => {
+  if (!rawDate) return null
+  
+  try {
+    // Handle Firebase server timestamp placeholder (not yet resolved)
+    if (typeof rawDate === 'object' && rawDate !== null && '_methodName' in rawDate && rawDate._methodName === 'serverTimestamp') {
+      // Server timestamp hasn't been resolved yet, return null
+      return null
+    }
+    
+    // Handle Firestore timestamp with seconds property
+    if (typeof rawDate === 'object' && rawDate !== null && 'seconds' in rawDate && typeof rawDate.seconds === 'number') {
+      return new Date(rawDate.seconds * 1000)
+    }
+    
+    // Handle Firestore timestamp with nanoseconds property (alternative format)
+    if (typeof rawDate === 'object' && rawDate !== null && 'nanoseconds' in rawDate && 'seconds' in rawDate) {
+      return new Date(rawDate.seconds * 1000 + rawDate.nanoseconds / 1000000)
+    }
+    
+    // Handle Firestore timestamp with toDate method
+    if (typeof rawDate === 'object' && rawDate !== null && typeof rawDate.toDate === 'function') {
+      return rawDate.toDate()
+    }
+    
+    // Handle string dates
+    if (typeof rawDate === 'string') {
+      const date = new Date(rawDate)
+      return isNaN(date.getTime()) ? null : date
+    }
+    
+    // Handle numeric timestamps
+    if (typeof rawDate === 'number') {
+      // Distinguish between seconds and milliseconds
+      const date = new Date(rawDate < 10000000000 ? rawDate * 1000 : rawDate)
+      return isNaN(date.getTime()) ? null : date
+    }
+    
+    // Handle Date objects
+    if (rawDate instanceof Date) {
+      return isNaN(rawDate.getTime()) ? null : rawDate
+    }
+    
+    return null
+  } catch (error) {
+    console.error('Error parsing date:', error, rawDate)
+    return null
+  }
+}
+
+// Function to calculate membership days
+const calculateMembershipDays = (createdAt: any) => {
+  if (!createdAt) return 0
+  
+  const createdDate = parseDate(createdAt)
+  if (!createdDate) {
+    // Don't log warning if it's a server timestamp placeholder
+    if (!(typeof createdAt === 'object' && createdAt?._methodName === 'serverTimestamp')) {
+      console.warn('Invalid createdAt date:', createdAt)
+    }
+    return 0
+  }
+  
+  const diffTime = Math.abs(Date.now() - createdDate.getTime())
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+}
+
+// Function to format last login date using Firebase Auth lastSignInTime
+const formatLastLogin = () => {
+  if (!authUser.value?.metadata?.lastSignInTime) return 'Nunca'
+  
+  try {
+    // Firebase Auth provides lastSignInTime as an ISO string
+    const date = new Date(authUser.value.metadata.lastSignInTime)
+    
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid lastSignInTime:', authUser.value.metadata.lastSignInTime)
+      return 'Fecha no disponible'
+    }
+    
+    return new Intl.DateTimeFormat('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date)
+  } catch (error) {
+    console.error('Error formatting last sign in date:', error)
+    return 'Error en fecha'
+  }
+}
+
+// Watch for changes in userProfile and authUser to update date values
+watch([userProfile, authUser], ([newProfile, newAuthUser]) => {
+  if (newProfile) {
+    // Update membership days
+    membershipDays.value = calculateMembershipDays(newProfile.createdAt)
+  }
+  
+  if (newAuthUser) {
+    // Update last login formatted using Firebase Auth data
+    lastLoginFormatted.value = formatLastLogin()
+  }
+}, { immediate: true, deep: true })
 
 // Methods
 const downloadProfileData = async () => {
@@ -280,17 +377,6 @@ const downloadProfileData = async () => {
     console.error('Error downloading profile data:', error)
   } finally {
     isDownloading.value = false
-  }
-}
-
-const refreshProfileData = async () => {
-  try {
-    isRefreshing.value = true
-    await refreshUserProfile()
-  } catch (error) {
-    console.error('Error refreshing profile:', error)
-  } finally {
-    isRefreshing.value = false
   }
 }
 

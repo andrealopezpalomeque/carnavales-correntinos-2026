@@ -174,7 +174,7 @@ const images = ref([
     width: 1152,
     height: 768,
     objectPosition: {
-      mobile: '45% center',
+      mobile: '18% center',
       tablet: 'center',
       desktop: 'center'
     }

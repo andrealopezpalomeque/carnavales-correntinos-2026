@@ -51,11 +51,11 @@
         <div
           v-for="(fact, index) in factsStore.facts"
           :key="fact.id"
-          class="group relative bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 hover:border-green-200 border border-gray-100 overflow-hidden"
+          class="group relative bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 hover:border-green-200 border border-gray-100 overflow-hidden h-full flex flex-col"
           :style="{ animationDelay: `${index * 100}ms` }"
         >
-          <!-- Card Header -->
-          <div class="p-4 pb-3">
+          <!-- Card Header and Content -->
+          <div class="p-4 pb-3 flex-1">
             <div class="flex items-center justify-between mb-3">
               <!-- Character Icon -->
               <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-md group-hover:shadow-green-500/30 transition-all duration-300 group-hover:scale-110">
@@ -336,20 +336,15 @@ onMounted(() => {
   box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
 }
 
-/* Grid masonry effect for different height cards (if needed) */
-.grid {
-  align-items: start;
-}
 
 /* Compact spacing adjustments */
 .gap-4 {
   gap: 1rem;
 }
 
-/* Ensure cards have consistent minimum height */
-.group {
-  min-height: 160px;
-  height: fit-content;
+/* Ensure cards have consistent height in grid */
+.grid {
+  align-items: stretch;
 }
 
 /* Text size optimizations for compact cards */

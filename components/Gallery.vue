@@ -79,22 +79,13 @@
       />
     </div>
 
-    <!-- Play/Pause Button -->
-    <button
-      @click="toggleAutoPlay"
-      class="absolute top-4 right-4 bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-full transition-all duration-200 backdrop-blur-sm"
-      :aria-label="isPlaying ? 'Pause slideshow' : 'Play slideshow'"
-    >
-      <Pause v-if="isPlaying" class="w-5 h-5" aria-hidden="true" />
-      <Play v-else class="w-5 h-5" aria-hidden="true" />
-    </button>
     </div>
   </LayoutContainer>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-vue-next'
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
 const images = ref([
   {
@@ -277,8 +268,6 @@ const getDynamicPosition = (basePosition, screenSize) => {
 
 // Carousel state
 const currentSlide = ref(0)
-const isPlaying = ref(true)
-let autoPlayInterval = null
 
 // Responsive image generation
 const getResponsiveSrcset = (basename, format) => {
@@ -318,27 +307,6 @@ const goToSlide = (index) => {
   currentSlide.value = index
 }
 
-// Auto-play functionality
-const startAutoPlay = () => {
-  if (autoPlayInterval) clearInterval(autoPlayInterval)
-  autoPlayInterval = setInterval(nextSlide, 8000) // Change slide every 8 seconds
-}
-
-const stopAutoPlay = () => {
-  if (autoPlayInterval) {
-    clearInterval(autoPlayInterval)
-    autoPlayInterval = null
-  }
-}
-
-const toggleAutoPlay = () => {
-  isPlaying.value = !isPlaying.value
-  if (isPlaying.value) {
-    startAutoPlay()
-  } else {
-    stopAutoPlay()
-  }
-}
 
 // Keyboard navigation
 const handleKeydown = (event) => {
@@ -348,10 +316,6 @@ const handleKeydown = (event) => {
       break
     case 'ArrowRight':
       nextSlide()
-      break
-    case ' ':
-      event.preventDefault()
-      toggleAutoPlay()
       break
   }
 }
@@ -394,7 +358,6 @@ const throttledUpdateScreenWidth = () => {
 // Lifecycle hooks
 onMounted(() => {
   checkWebPSupport()
-  startAutoPlay()
   updateScreenWidth()
   window.addEventListener('resize', throttledUpdateScreenWidth)
   document.addEventListener('keydown', handleKeydown)
@@ -403,7 +366,6 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  stopAutoPlay()
   if (resizeTimeout) clearTimeout(resizeTimeout)
   window.removeEventListener('resize', throttledUpdateScreenWidth)
   document.removeEventListener('keydown', handleKeydown)

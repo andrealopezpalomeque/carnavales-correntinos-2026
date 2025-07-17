@@ -43,10 +43,14 @@ export const useFactsStore = defineStore('facts', {
       this.isLoading = true
       try {
         // Use the composable directly
-        const { getFacts } = useFirebase()
+        const { getFacts, getUserVotes } = useFirebase()
         this.facts = await getFacts()
+        
+        // Load user's votes from Firebase
+        const userVoteIds = await getUserVotes()
+        this.userVotes = new Set(userVoteIds)
+        
         this.calculateTotalVotes()
-        this.loadUserVotes()
       } catch (error) {
         console.warn('Firebase not available, using sample data')
         // Fallback to sample data if Firebase is not available
@@ -61,7 +65,7 @@ export const useFactsStore = defineStore('facts', {
           { id: '8', text: 'El primer carnaval oficial de Corrientes se celebró en 1982.', votes: 6 }
         ]
         this.calculateTotalVotes()
-        this.loadUserVotes()
+        this.loadUserVotes() // Fallback to localStorage for offline mode
       } finally {
         this.isLoading = false
       }
@@ -80,14 +84,25 @@ export const useFactsStore = defineStore('facts', {
       this.votingId = id
       try {
         // Try to use Firebase first
-        const { voteFact } = useFirebase()
+        const { voteFact, hasUserVoted } = useFirebase()
+        
+        // Double-check on server if user has voted
+        const alreadyVoted = await hasUserVoted(id)
+        if (alreadyVoted) {
+          if (process.client && window.useNotifications) {
+            const { notifyWarning } = useNotifications()
+            notifyWarning('¡Ya votaste!', 'Solo puedes votar una vez por curiosidad')
+          }
+          return
+        }
+        
         await voteFact(id)
         
         const factIndex = this.facts.findIndex(fact => fact.id === id)
         if (factIndex !== -1) {
           this.facts[factIndex].votes++
           this.userVotes.add(id)
-          this.saveUserVotes()
+          this.saveUserVotes() // Keep localStorage as backup
           this.calculateTotalVotes()
           
           // Add to recent activity
@@ -132,14 +147,14 @@ export const useFactsStore = defineStore('facts', {
       this.totalVotes = this.facts.reduce((sum, fact) => sum + fact.votes, 0)
     },
 
-    // Save user votes to localStorage
+    // Save user votes to localStorage (backup)
     saveUserVotes() {
       if (process.client) {
         localStorage.setItem('userVotes', JSON.stringify([...this.userVotes]))
       }
     },
 
-    // Load user votes from localStorage
+    // Load user votes from localStorage (fallback)
     loadUserVotes() {
       if (process.client) {
         const saved = localStorage.getItem('userVotes')

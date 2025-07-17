@@ -182,7 +182,25 @@ const loadStats = async () => {
         email: 'msofiarriiuca@gmail.com',
         success: true,
         timestamp: '1 día atrás'
-      }
+      },
+      {
+        id: 4,
+        email: 'gonzavalesani@gmail.com',
+        success: true,
+        timestamp: '3 días atrás'
+      },
+      {
+        id: 5,
+        email: 'sebastianvalesani@gmail.com',
+        success: true,
+        timestamp: '1 semana atrás'
+      },
+      {
+        id: 6,
+        email: 'constanzaescobar15@gmail.com',
+        success: true,
+        timestamp: '2 semanas atrás'
+      } 
     ]
   } catch (error) {
     console.error('Error loading whitelist stats:', error)

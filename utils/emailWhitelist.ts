@@ -1,7 +1,10 @@
 // Email whitelist configuration
 export const ALLOWED_EMAILS = [
   'andrealopezpalomeque@gmail.com',
-  'msofiarriiuca@gmail.com'
+  'msofiarriiuca@gmail.com',
+  'gonzavalesani@gmail.com',
+  'sebastianvalesani@gmail.com',
+  'constanzaescobar15@gmail.com'
 ]
 
 // Function to check if an email is whitelisted

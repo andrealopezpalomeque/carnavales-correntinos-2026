@@ -10,7 +10,10 @@ service cloud.firestore {
       return request.auth != null && 
              request.auth.token.email in [
                'andrealopezpalomeque@gmail.com',
-               'msofiarriiuca@gmail.com'
+               'msofiarriiuca@gmail.com',
+               'gonzavalesani@gmail.com',
+               'sebastianvalesani@gmail.com',
+               'constanzaescobar15@gmail.com'
              ];
     }
     
@@ -175,6 +178,14 @@ service cloud.firestore {
       // Authenticated users can create their own activity logs
       allow create: if isAuthenticated() && 
                        request.resource.data.userId == request.auth.uid;
+    }
+
+    // User votes collection
+    match /userVotes/{voteId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.userId;
     }
     
     // Fallback rule - deny everything else

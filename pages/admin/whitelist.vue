@@ -200,7 +200,13 @@ const loadStats = async () => {
         email: 'constanzaescobar15@gmail.com',
         success: true,
         timestamp: '2 semanas atrás'
-      } 
+      },
+      {
+        id: 7,
+        email: 'imanolcorimayo@gmail.com',
+        success: true,
+        timestamp: '2 semanas atrás'
+      }
     ]
   } catch (error) {
     console.error('Error loading whitelist stats:', error)

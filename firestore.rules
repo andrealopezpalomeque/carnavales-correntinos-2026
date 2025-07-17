@@ -13,7 +13,8 @@ service cloud.firestore {
                'msofiarriiuca@gmail.com',
                'gonzavalesani@gmail.com',
                'sebastianvalesani@gmail.com',
-               'constanzaescobar15@gmail.com'
+               'constanzaescobar15@gmail.com',
+               'imanolcorimayo@gmail.com'
              ];
     }
     

@@ -206,6 +206,12 @@ const loadStats = async () => {
         email: 'imanolcorimayo@gmail.com',
         success: true,
         timestamp: '2 semanas atrás'
+      },
+      {
+        id: 8,
+        email: 'guidovalesani@gmail.com',
+        success: true,
+        timestamp: '3 semanas atrás'
       }
     ]
   } catch (error) {

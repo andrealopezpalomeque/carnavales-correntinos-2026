@@ -62,10 +62,10 @@ service cloud.firestore {
 
     // Users collection
     match /users/{userId} {
-      // Read: User can read their own profile, admins can read all, public profiles can be read by whitelisted users
+      // Read: User can read their own profile, admins can read all users, whitelisted users can read all for directory
       allow read: if isOwner(userId) || 
                      isAdmin() || 
-                     (isEmailWhitelisted() && resource.data.preferences.privacy.showProfile == true);
+                     isEmailWhitelisted();
       
       // Create: Only whitelisted users can create their profile
       allow create: if isEmailWhitelisted() &&
@@ -188,6 +188,68 @@ service cloud.firestore {
         request.auth.uid == resource.data.userId;
       allow create: if request.auth != null && 
         request.auth.uid == request.resource.data.userId;
+    }
+
+    // User interactions collections
+    match /userLikes/{likeId} {
+      // Users can read their own likes and likes they've given/received
+      allow read: if isEmailWhitelisted() && 
+                     (request.auth.uid == resource.data.fromUserId || 
+                      request.auth.uid == resource.data.toUserId);
+      // Users can create likes from themselves to others
+      allow create: if isEmailWhitelisted() && 
+                       request.auth.uid == request.resource.data.fromUserId &&
+                       request.resource.data.fromUserId != request.resource.data.toUserId;
+      // Users can delete their own likes
+      allow delete: if isEmailWhitelisted() && 
+                       request.auth.uid == resource.data.fromUserId;
+    }
+
+    match /friendRequests/{requestId} {
+      // Users can read requests they sent or received
+      allow read: if isEmailWhitelisted() && 
+                     (request.auth.uid == resource.data.fromUserId || 
+                      request.auth.uid == resource.data.toUserId);
+      // Users can create friend requests from themselves to others
+      allow create: if isEmailWhitelisted() && 
+                       request.auth.uid == request.resource.data.fromUserId &&
+                       request.resource.data.fromUserId != request.resource.data.toUserId &&
+                       request.resource.data.status == 'pending';
+      // Users can update requests they received (to accept/decline)
+      allow update: if isEmailWhitelisted() && 
+                       request.auth.uid == resource.data.toUserId &&
+                       request.resource.data.status in ['accepted', 'declined'] &&
+                       resource.data.status == 'pending';
+      // Users can delete their own sent requests
+      allow delete: if isEmailWhitelisted() && 
+                       request.auth.uid == resource.data.fromUserId;
+    }
+
+    match /friendships/{friendshipId} {
+      // Users can read friendships they're part of
+      allow read: if isEmailWhitelisted() && 
+                     (request.auth.uid == resource.data.user1Id || 
+                      request.auth.uid == resource.data.user2Id);
+      // Only the system can create friendships (through friend request acceptance)
+      allow create: if false;
+      // Users can delete friendships they're part of (to unfriend)
+      allow delete: if isEmailWhitelisted() && 
+                       (request.auth.uid == resource.data.user1Id || 
+                        request.auth.uid == resource.data.user2Id);
+    }
+
+    match /userFollows/{followId} {
+      // Users can read follows they're involved in
+      allow read: if isEmailWhitelisted() && 
+                     (request.auth.uid == resource.data.followerId || 
+                      request.auth.uid == resource.data.followingId);
+      // Users can create follows from themselves to others
+      allow create: if isEmailWhitelisted() && 
+                       request.auth.uid == request.resource.data.followerId &&
+                       request.resource.data.followerId != request.resource.data.followingId;
+      // Users can delete their own follows
+      allow delete: if isEmailWhitelisted() && 
+                       request.auth.uid == resource.data.followerId;
     }
     
     // Fallback rule - deny everything else

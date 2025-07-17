@@ -181,14 +181,39 @@
               </div>
             </div>
 
+            <!-- Interaction Stats -->
+            <div v-if="user.interactions" class="mt-4 grid grid-cols-2 gap-2 text-xs text-gray-600">
+              <div class="flex items-center space-x-1">
+                <svg class="w-3 h-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+                <span>{{ user.interactions.likesReceived }} likes</span>
+              </div>
+              <div class="flex items-center space-x-1">
+                <svg class="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.196-2.121M9 6a3 3 0 106 0 3 3 0 00-6 0zm9 13a5 5 0 01-10 0h10z"/>
+                </svg>
+                <span>{{ user.interactions.friendsCount }} amigos</span>
+              </div>
+            </div>
+
+            <!-- User Interaction Buttons -->
+            <div class="mt-4">
+              <UserInteractionButtons 
+                :target-user="user" 
+                compact
+                @interaction-update="handleInteractionUpdate(user)"
+              />
+            </div>
+
             <!-- Actions -->
             <div class="mt-4 flex space-x-2">
-              <button
-                @click="viewProfile(user)"
-                class="flex-1 px-3 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-colors"
+              <NuxtLink
+                :to="`/profile/${user.uid}`"
+                class="flex-1 px-3 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-colors text-center"
               >
                 Ver Perfil
-              </button>
+              </NuxtLink>
               <button
                 v-if="canContact(user)"
                 @click="contactUser(user)"
@@ -411,23 +436,84 @@ const getInitials = (name: string): string => {
     .join('')
 }
 
-const formatDate = (date: Date): string => {
-  const diffTime = Math.abs(new Date().getTime() - new Date(date).getTime())
+// Helper function to safely convert various date formats to Date object
+const parseDate = (rawDate: any): Date | null => {
+  if (!rawDate) return null
+  
+  try {
+    // Handle Firebase server timestamp placeholder (not yet resolved)
+    if (typeof rawDate === 'object' && rawDate !== null && '_methodName' in rawDate && rawDate._methodName === 'serverTimestamp') {
+      // Server timestamp hasn't been resolved yet, return null
+      return null
+    }
+    
+    // Handle Firestore timestamp with seconds property
+    if (typeof rawDate === 'object' && rawDate !== null && 'seconds' in rawDate && typeof rawDate.seconds === 'number') {
+      return new Date(rawDate.seconds * 1000)
+    }
+    
+    // Handle Firestore timestamp with nanoseconds property (alternative format)
+    if (typeof rawDate === 'object' && rawDate !== null && 'nanoseconds' in rawDate && 'seconds' in rawDate) {
+      return new Date(rawDate.seconds * 1000 + rawDate.nanoseconds / 1000000)
+    }
+    
+    // Handle Firestore timestamp with toDate method
+    if (typeof rawDate === 'object' && rawDate !== null && typeof rawDate.toDate === 'function') {
+      return rawDate.toDate()
+    }
+    
+    // Handle string dates
+    if (typeof rawDate === 'string') {
+      const date = new Date(rawDate)
+      return isNaN(date.getTime()) ? null : date
+    }
+    
+    // Handle numeric timestamps
+    if (typeof rawDate === 'number') {
+      // Distinguish between seconds and milliseconds
+      const date = new Date(rawDate < 10000000000 ? rawDate * 1000 : rawDate)
+      return isNaN(date.getTime()) ? null : date
+    }
+    
+    // Handle Date objects
+    if (rawDate instanceof Date) {
+      return isNaN(rawDate.getTime()) ? null : rawDate
+    }
+    
+    return null
+  } catch (error) {
+    console.error('Error parsing date:', error, rawDate)
+    return null
+  }
+}
+
+const formatDate = (date: any): string => {
+  const parsedDate = parseDate(date)
+  if (!parsedDate) {
+    return 'Fecha no disponible'
+  }
+  
+  const diffTime = Math.abs(new Date().getTime() - parsedDate.getTime())
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   
   if (diffDays === 1) return 'Ayer'
   if (diffDays < 7) return `Hace ${diffDays} días`
   if (diffDays < 30) return `Hace ${Math.ceil(diffDays / 7)} semanas`
   
-  return new Date(date).toLocaleDateString('es-ES', {
+  return parsedDate.toLocaleDateString('es-ES', {
     year: 'numeric',
     month: 'short',
     day: 'numeric'
   })
 }
 
-const formatLongDate = (date: Date): string => {
-  return new Date(date).toLocaleDateString('es-ES', {
+const formatLongDate = (date: any): string => {
+  const parsedDate = parseDate(date)
+  if (!parsedDate) {
+    return 'Fecha no disponible'
+  }
+  
+  return parsedDate.toLocaleDateString('es-ES', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -449,8 +535,11 @@ const getRoleBadgeClasses = (role: string): string => {
 
 const isOnline = (user: UserProfile): boolean => {
   // Consider a user online if last login was within last 5 minutes
+  const parsedDate = parseDate(user.lastLoginAt)
+  if (!parsedDate) return false
+  
   const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000)
-  return new Date(user.lastLoginAt) > fiveMinutesAgo
+  return parsedDate > fiveMinutesAgo
 }
 
 const canContact = (user: UserProfile): boolean => {
@@ -488,6 +577,21 @@ const closeModal = () => {
 const contactUser = (user: UserProfile) => {
   if (user.preferences?.privacy?.showEmail) {
     window.location.href = `mailto:${user.email}`
+  }
+}
+
+const handleInteractionUpdate = async (user: UserProfile) => {
+  // Reload the user to get updated interaction counts
+  try {
+    const updatedUser = await dbService.getUserProfile(user.uid)
+    if (updatedUser) {
+      const userIndex = users.value.findIndex(u => u.uid === user.uid)
+      if (userIndex !== -1) {
+        users.value[userIndex] = updatedUser
+      }
+    }
+  } catch (error) {
+    console.error('Error updating user data:', error)
   }
 }
 

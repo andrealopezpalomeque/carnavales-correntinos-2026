@@ -23,6 +23,8 @@ export interface UserProfile {
   createdAt: Date
   updatedAt: Date
   lastLoginAt: Date
+  // Social interactions
+  interactions?: UserInteractions
 }
 
 // Preferencias del usuario
@@ -73,6 +75,58 @@ export interface UpdateUserProfileData extends CreateUserProfileData {
 
 // Respuesta de operaciones
 export interface AuthResponse {
+  success: boolean
+  error?: string
+  data?: any
+}
+
+// User Interactions
+export interface UserInteractions {
+  likesReceived: number
+  likesGiven: number
+  friendsCount: number
+  followersCount: number
+  followingCount: number
+}
+
+// User Like
+export interface UserLike {
+  id?: string
+  fromUserId: string
+  toUserId: string
+  createdAt: Date
+}
+
+// Friend Request
+export interface FriendRequest {
+  id?: string
+  fromUserId: string
+  toUserId: string
+  status: FriendRequestStatus
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type FriendRequestStatus = 'pending' | 'accepted' | 'declined'
+
+// User Follow
+export interface UserFollow {
+  id?: string
+  followerId: string
+  followingId: string
+  createdAt: Date
+}
+
+// Friendship
+export interface Friendship {
+  id?: string
+  user1Id: string
+  user2Id: string
+  createdAt: Date
+}
+
+// User Interaction Response
+export interface InteractionResponse {
   success: boolean
   error?: string
   data?: any

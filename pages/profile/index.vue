@@ -115,6 +115,98 @@
         </button>
       </div>
 
+      <!-- Social Interactions -->
+      <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Mis Interacciones</h3>
+        
+        <!-- Interaction Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="text-center p-4 bg-red-50 rounded-lg">
+            <div class="text-2xl font-bold text-red-600">{{ userProfile?.interactions?.likesReceived || 0 }}</div>
+            <div class="text-sm text-gray-600">Likes recibidos</div>
+          </div>
+          <div class="text-center p-4 bg-blue-50 rounded-lg">
+            <div class="text-2xl font-bold text-blue-600">{{ userProfile?.interactions?.friendsCount || 0 }}</div>
+            <div class="text-sm text-gray-600">Amigos</div>
+          </div>
+          <div class="text-center p-4 bg-purple-50 rounded-lg">
+            <div class="text-2xl font-bold text-purple-600">{{ userProfile?.interactions?.likesGiven || 0 }}</div>
+            <div class="text-sm text-gray-600">Likes dados</div>
+          </div>
+          <div class="text-center p-4 bg-yellow-50 rounded-lg">
+            <div class="text-2xl font-bold text-yellow-600">{{ pendingFriendRequests.length }}</div>
+            <div class="text-sm text-gray-600">Solicitudes pendientes</div>
+          </div>
+        </div>
+
+        <!-- Friend Requests -->
+        <div v-if="pendingFriendRequests.length > 0" class="mb-6">
+          <h4 class="text-md font-semibold text-gray-900 mb-3">Solicitudes de Amistad</h4>
+          <div class="space-y-3">
+            <div 
+              v-for="request in pendingFriendRequests" 
+              :key="request.id"
+              class="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg"
+            >
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-medium text-gray-900">Solicitud de amistad</div>
+                  <div class="text-sm text-gray-600">{{ formatDate(request.createdAt) }}</div>
+                </div>
+              </div>
+              <div class="flex space-x-2">
+                <button
+                  @click="respondToFriendRequest(request.id!, 'accepted')"
+                  :disabled="isRespondingToRequest"
+                  class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:opacity-50 transition-colors"
+                >
+                  Aceptar
+                </button>
+                <button
+                  @click="respondToFriendRequest(request.id!, 'declined')"
+                  :disabled="isRespondingToRequest"
+                  class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 disabled:opacity-50 transition-colors"
+                >
+                  Rechazar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="flex flex-wrap gap-3">
+          <NuxtLink 
+            to="/users" 
+            class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm flex items-center space-x-2"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.196-2.121M9 6a3 3 0 106 0 3 3 0 00-6 0zm9 13a5 5 0 01-10 0h10z"/>
+            </svg>
+            <span>Explorar Usuarios</span>
+          </NuxtLink>
+          <button
+            @click="loadFriendRequests"
+            :disabled="isLoadingRequests"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors text-sm flex items-center space-x-2"
+          >
+            <svg v-if="isLoadingRequests" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+            </svg>
+            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            <span>{{ isLoadingRequests ? 'Actualizando...' : 'Actualizar Solicitudes' }}</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Danger Zone -->
       <div class="mt-8 bg-red-50 border border-red-200 rounded-lg p-6">
         <h3 class="text-lg font-semibold text-red-900 mb-4">Zona de Peligro</h3>
@@ -203,7 +295,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 
 // Page meta
 definePageMeta({
@@ -225,6 +317,11 @@ const {
   updateUserProfile 
 } = useAuthEnhanced()
 
+const { 
+  getFriendRequests, 
+  respondToFriendRequest: respondToRequest 
+} = useUserInteractions()
+
 // Get Firebase auth user for lastSignInTime
 const { $firebase } = useNuxtApp()
 const authUser = computed(() => $firebase?.auth?.currentUser)
@@ -236,6 +333,11 @@ const showDeleteConfirmation = ref(false)
 const deleteConfirmationText = ref('')
 const showDeactivateModal = ref(false)
 const isDeactivating = ref(false)
+
+// Friend requests state
+const pendingFriendRequests = ref<any[]>([])
+const isLoadingRequests = ref(false)
+const isRespondingToRequest = ref(false)
 
 // Reactive values for dates to avoid initial undefined issues
 const membershipDays = ref(0)
@@ -492,6 +594,59 @@ const cancelDeleteAccount = () => {
   showDeleteConfirmation.value = false
   deleteConfirmationText.value = ''
 }
+
+// Friend request management
+const loadFriendRequests = async () => {
+  try {
+    isLoadingRequests.value = true
+    const requests = await getFriendRequests('received')
+    pendingFriendRequests.value = requests
+  } catch (error) {
+    console.error('Error loading friend requests:', error)
+  } finally {
+    isLoadingRequests.value = false
+  }
+}
+
+const respondToFriendRequest = async (requestId: string, response: 'accepted' | 'declined') => {
+  try {
+    isRespondingToRequest.value = true
+    const success = await respondToRequest(requestId, response)
+    
+    if (success) {
+      // Remove the request from the list
+      pendingFriendRequests.value = pendingFriendRequests.value.filter(req => req.id !== requestId)
+      
+      // Refresh user profile to update stats
+      await updateUserProfile({})
+    }
+  } catch (error) {
+    console.error('Error responding to friend request:', error)
+  } finally {
+    isRespondingToRequest.value = false
+  }
+}
+
+const formatDate = (date: Date | string): string => {
+  const dateObj = date instanceof Date ? date : new Date(date)
+  const diffTime = Math.abs(new Date().getTime() - dateObj.getTime())
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  
+  if (diffDays === 1) return 'Ayer'
+  if (diffDays < 7) return `Hace ${diffDays} días`
+  if (diffDays < 30) return `Hace ${Math.ceil(diffDays / 7)} semanas`
+  
+  return dateObj.toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
+}
+
+// Load friend requests on mount
+onMounted(() => {
+  loadFriendRequests()
+})
 
 // Authentication is handled by the 'auth' middleware
 </script>

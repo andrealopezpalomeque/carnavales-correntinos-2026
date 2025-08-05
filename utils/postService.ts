@@ -224,42 +224,19 @@ export class PostService {
     try {
       const db = this.ensureFirestore()
       const postsRef = collection(db, 'posts')
-      const constraints: QueryConstraint[] = [
-        where('authorId', '==', userId)
-      ]
-
-      // Add sorting
-      const sortBy = queryOptions.sortBy || 'newest'
-      if (sortBy === 'newest') {
-        constraints.push(orderBy('createdAt', 'desc'))
-      } else if (sortBy === 'oldest') {
-        constraints.push(orderBy('createdAt', 'asc'))
-      } else if (sortBy === 'most_liked') {
-        constraints.push(orderBy('likes', 'desc'))
-      } else if (sortBy === 'most_commented') {
-        constraints.push(orderBy('comments', 'desc'))
-      }
-
-      // Add limit
+      
+      // Simple query without ordering to avoid Firebase index requirement
       const limitCount = queryOptions.limit || 20
-      constraints.push(limit(limitCount + 1)) // +1 to check if there are more
-
-      // Add cursor for pagination
-      if (queryOptions.cursor) {
-        // TODO: Implement cursor-based pagination
-      }
-
-      const q = query(postsRef, ...constraints)
+      const q = query(
+        postsRef, 
+        where('authorId', '==', userId),
+        limit(limitCount * 2) // Get more posts to allow for in-memory sorting
+      )
+      
       const querySnapshot = await getDocs(q)
-
-      const posts: UserPost[] = []
-      const docs = querySnapshot.docs
-
-      // Check if there are more posts
-      const hasMore = docs.length > limitCount
-      const postsToProcess = hasMore ? docs.slice(0, limitCount) : docs
-
-      for (const doc of postsToProcess) {
+      
+      let posts: UserPost[] = []
+      querySnapshot.forEach(doc => {
         const data = doc.data()
         posts.push({
           id: doc.id,
@@ -278,13 +255,33 @@ export class PostService {
           isEdited: data.isEdited || false,
           editHistory: data.editHistory || []
         })
+      })
+
+      // Sort in memory to avoid Firebase index requirement
+      const sortBy = queryOptions.sortBy || 'newest'
+      if (sortBy === 'newest') {
+        posts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      } else if (sortBy === 'oldest') {
+        posts.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      } else if (sortBy === 'most_liked') {
+        posts.sort((a, b) => (b.likes || 0) - (a.likes || 0))
+      } else if (sortBy === 'most_commented') {
+        posts.sort((a, b) => (b.comments || 0) - (a.comments || 0))
       }
+
+      // Apply limit after sorting and check if there are more
+      const hasMore = posts.length > limitCount
+      if (hasMore) {
+        posts = posts.slice(0, limitCount)
+      }
+
+      console.log(`📄 Retrieved and sorted ${posts.length} posts for user ${userId}`)
 
       return {
         success: true,
         data: posts,
         hasMore,
-        nextCursor: hasMore ? docs[limitCount - 1].id : undefined
+        nextCursor: hasMore && posts.length > 0 ? posts[posts.length - 1].id : undefined
       }
     } catch (error: any) {
       console.error('Error getting user posts:', error)

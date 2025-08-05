@@ -344,7 +344,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { dbService } from '~/utils/database'
 import type { UserProfile } from '~/types/user'
 
@@ -361,7 +361,7 @@ useSeoMeta({
 })
 
 // Composables
-const { authUser, hasRole } = useAuthEnhanced()
+const { authUser, hasRole, userProfile } = useAuthEnhanced()
 
 // State
 const users = ref<UserProfile[]>([])
@@ -623,6 +623,24 @@ function debounce(func: Function, wait: number) {
     timeout = setTimeout(later, wait)
   }
 }
+
+// Refresh current user data in users list when profile changes
+const refreshCurrentUserInList = () => {
+  if (!userProfile.value) return
+  
+  const userIndex = users.value.findIndex(u => u.uid === userProfile.value!.uid)
+  if (userIndex !== -1) {
+    users.value[userIndex] = { ...userProfile.value }
+    console.log('🔄 Updated current user in users list with new profile data')
+  }
+}
+
+// Watch for changes in current user's profile to update their data in the users list
+watch(userProfile, (newProfile) => {
+  if (newProfile) {
+    refreshCurrentUserInList()
+  }
+}, { deep: true })
 
 // Lifecycle
 onMounted(() => {

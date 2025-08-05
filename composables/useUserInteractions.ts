@@ -141,8 +141,17 @@ export const useUserInteractions = () => {
         const message = response === 'accepted' ? 'Solicitud aceptada' : 'Solicitud rechazada'
         const description = response === 'accepted' ? 'Ahora son amigos' : 'Solicitud rechazada'
         notifySuccess(message, description)
-        // Refresh current user's profile to update interaction counts
-        await refreshUserProfile()
+        
+        // For accepted requests, wait for interaction counts to be updated before refreshing profile
+        if (response === 'accepted') {
+          setTimeout(async () => {
+            console.log('🔄 Refreshing profile after friend acceptance...')
+            await refreshUserProfile()
+            console.log('✅ Profile refreshed after friend acceptance')
+          }, 1000) // Wait 1 second to ensure database update completes
+        } else {
+          await refreshUserProfile()
+        }
         return true
       } else {
         error.value = result.error || 'Error al responder solicitud'
@@ -172,8 +181,12 @@ export const useUserInteractions = () => {
       
       if (result.success) {
         notifySuccess('Amistad eliminada', 'Ya no son amigos')
-        // Refresh current user's profile to update interaction counts
-        await refreshUserProfile()
+        // Wait for interaction counts to be updated before refreshing profile
+        setTimeout(async () => {
+          console.log('🔄 Refreshing profile after removing friend...')
+          await refreshUserProfile()
+          console.log('✅ Profile refreshed after removing friend')
+        }, 1000) // Wait 1 second to ensure database update completes
         return true
       } else {
         error.value = result.error || 'Error al eliminar amistad'

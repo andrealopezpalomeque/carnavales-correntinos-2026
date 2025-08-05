@@ -646,8 +646,16 @@ const respondToFriendRequest = async (requestId: string, response: 'accepted' | 
       // Remove the request from the list
       pendingFriendRequests.value = pendingFriendRequests.value.filter(req => req.id !== requestId)
       
-      // Refresh user profile to update stats
-      await updateUserProfile({})
+      // For accepted requests, wait before refreshing to ensure DB updates complete
+      if (response === 'accepted') {
+        setTimeout(async () => {
+          console.log('🔄 Refreshing profile stats after friend acceptance...')
+          await updateUserProfile({})
+          console.log('✅ Profile stats refreshed after friend acceptance')
+        }, 1200) // Wait a bit longer since this method also refreshes stats
+      } else {
+        await updateUserProfile({})
+      }
     }
   } catch (error) {
     console.error('Error responding to friend request:', error)

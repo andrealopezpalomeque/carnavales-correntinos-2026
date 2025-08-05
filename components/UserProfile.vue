@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto" role="main" aria-labelledby="profile-heading">
+  <div class="bg-white rounded-lg shadow-md p-6" role="main" aria-labelledby="profile-heading">
     <div class="flex items-center justify-between mb-6">
       <h2 id="profile-heading" class="text-2xl font-bold text-gray-900">Mi Perfil</h2>
       <button

@@ -172,7 +172,7 @@
         </div>
 
         <!-- Activity Timeline -->
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
           <h3 class="text-lg font-semibold text-gray-900 mb-4">Información de la cuenta</h3>
           <div class="space-y-4">
             <div class="flex items-center space-x-3">
@@ -200,6 +200,85 @@
             </div>
           </div>
         </div>
+
+        <!-- User Posts -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">
+              Publicaciones {{ isCurrentUser ? 'mías' : `de ${userProfile.displayName}` }}
+            </h3>
+            <button
+              @click="loadUserPosts"
+              :disabled="isLoadingPosts"
+              class="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              title="Actualizar publicaciones"
+            >
+              <svg class="w-4 h-4" :class="{ 'animate-spin': isLoadingPosts }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Loading State -->
+          <div v-if="isLoadingPosts && userPosts.length === 0" class="flex items-center justify-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+            <span class="ml-2 text-gray-600">Cargando publicaciones...</span>
+          </div>
+
+          <!-- Empty State -->
+          <div v-else-if="userPosts.length === 0" class="text-center py-8">
+            <div class="mx-auto h-16 w-16 text-gray-400 mb-4">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10m0 0V6a2 2 0 00-2-2H9a2 2 0 00-2 2v2m10 0v10a2 2 0 01-2 2H9a2 2 0 01-2-2V8m10 0H7"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">
+              {{ isCurrentUser ? 'Aún no has publicado nada' : 'Este usuario no ha publicado nada' }}
+            </h3>
+            <p class="text-gray-600">
+              {{ isCurrentUser ? 'Comparte algo con la comunidad de carnaval' : 'Cuando publique algo, aparecerá aquí' }}
+            </p>
+            <NuxtLink 
+              v-if="isCurrentUser"
+              to="/feed" 
+              class="inline-flex items-center px-4 py-2 mt-4 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Crear publicación
+            </NuxtLink>
+          </div>
+
+          <!-- Posts List -->
+          <div v-else class="space-y-6">
+            <PostCard
+              v-for="post in userPosts"
+              :key="post.id"
+              :post="post"
+              @post-updated="handlePostUpdated"
+              @post-deleted="handlePostDeleted"
+            />
+
+            <!-- Load More Button -->
+            <div v-if="hasMorePosts" class="text-center">
+              <button
+                @click="loadMorePosts"
+                :disabled="isLoadingMorePosts"
+                class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+              >
+                <span v-if="isLoadingMorePosts" class="flex items-center">
+                  <svg class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                  </svg>
+                  Cargando más...
+                </span>
+                <span v-else>Ver más publicaciones</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -208,7 +287,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { dbService } from '~/utils/database'
+import { posts as postService } from '~/utils/postService'
 import type { UserProfile } from '~/types/user'
+import type { PostWithAuthor } from '~/types/post'
 
 // Page meta
 definePageMeta({
@@ -236,6 +317,13 @@ const { authUser, hasRole } = useAuthEnhanced()
 const userProfile = ref<UserProfile | null>(null)
 const isLoading = ref(false)
 const error = ref<string | null>(null)
+
+// Posts state
+const userPosts = ref<PostWithAuthor[]>([])
+const isLoadingPosts = ref(false)
+const isLoadingMorePosts = ref(false)
+const hasMorePosts = ref(false)
+const postsNextCursor = ref<string>()
 
 // Computed
 const isCurrentUser = computed(() => 
@@ -396,6 +484,9 @@ const loadUserProfile = async () => {
     description.value = profile.bio 
       ? `Perfil de ${profile.displayName || 'usuario'}: ${profile.bio.substring(0, 160)}...`
       : `Perfil de ${profile.displayName || 'usuario'} en la comunidad de Carnavales Correntinos`
+    
+    // Load user posts after loading profile
+    await loadUserPosts()
       
   } catch (err: any) {
     console.error('Error loading user profile:', err)
@@ -403,6 +494,64 @@ const loadUserProfile = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+const loadUserPosts = async (resetPosts = true) => {
+  try {
+    if (resetPosts) {
+      isLoadingPosts.value = true
+      userPosts.value = []
+    } else {
+      isLoadingMorePosts.value = true
+    }
+
+    const result = await postService.getUserPosts(targetUserId, {
+      limit: 10,
+      cursor: resetPosts ? undefined : postsNextCursor.value
+    })
+
+    if (result.success && result.data) {
+      console.log('📄 Raw user posts received:', result.data.length)
+      
+      // Enrich posts with author information
+      const enrichedPosts = await postService.enrichWithAuthors(result.data)
+      console.log('✨ Enriched user posts:', enrichedPosts.length)
+      
+      if (resetPosts) {
+        userPosts.value = enrichedPosts
+      } else {
+        userPosts.value.push(...enrichedPosts)
+      }
+
+      hasMorePosts.value = result.hasMore || false
+      postsNextCursor.value = result.nextCursor
+      
+      console.log('✅ User posts loaded successfully. Total posts:', userPosts.value.length)
+    } else {
+      console.error('❌ User posts loading failed:', result.error)
+    }
+  } catch (err: any) {
+    console.error('❌ Error loading user posts:', err)
+  } finally {
+    isLoadingPosts.value = false
+    isLoadingMorePosts.value = false
+  }
+}
+
+const loadMorePosts = async () => {
+  if (!hasMorePosts.value || isLoadingMorePosts.value) return
+  await loadUserPosts(false)
+}
+
+const handlePostUpdated = (updatedPost: PostWithAuthor) => {
+  const index = userPosts.value.findIndex(p => p.id === updatedPost.id)
+  if (index !== -1) {
+    userPosts.value[index] = updatedPost
+  }
+}
+
+const handlePostDeleted = (postId: string) => {
+  userPosts.value = userPosts.value.filter(p => p.id !== postId)
 }
 
 // Redirect current user to their own profile page

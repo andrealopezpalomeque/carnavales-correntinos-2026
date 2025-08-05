@@ -15,6 +15,11 @@
         <FriendRequests />
       </div>
 
+      <!-- Friends List -->
+      <div class="mt-8">
+        <FriendsList />
+      </div>
+
       <!-- Activity Summary -->
       <div class="mt-8 bg-white rounded-lg shadow-md p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Resumen de Actividad</h3>

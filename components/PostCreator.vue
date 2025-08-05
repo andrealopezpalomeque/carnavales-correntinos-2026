@@ -64,12 +64,58 @@
             <!-- Location (Optional) -->
             <div class="flex items-center space-x-2 w-full sm:w-auto">
               <label for="location" class="text-sm font-medium text-gray-700 shrink-0">📍</label>
-              <input
+              <select
                 id="location"
                 v-model="postLocation"
-                type="text"
-                placeholder="Agregar ubicación..."
                 class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500 flex-1 sm:flex-none"
+              >
+                <option value="">Seleccionar ubicación...</option>
+                <optgroup label="🏛️ Corrientes Capital">
+                  <option value="Centro de Corrientes">Centro de Corrientes</option>
+                  <option value="Costanera de Corrientes">Costanera de Corrientes</option>
+                  <option value="Plaza 25 de Mayo">Plaza 25 de Mayo</option>
+                  <option value="Puente General Belgrano">Puente General Belgrano</option>
+                  <option value="Teatro Juan de Vera">Teatro Juan de Vera</option>
+                </optgroup>
+                <optgroup label="🎭 Lugares de Carnaval">
+                  <option value="Corsódromo">Corsódromo</option>
+                  <option value="Anfiteatro Cocomarola">Anfiteatro Cocomarola</option>
+                  <option value="Plaza de la Cruz">Plaza de la Cruz</option>
+                  <option value="Boulevard Pocho Roch">Boulevard Pocho Roch</option>
+                  <option value="Centro Cultural Alternativo">Centro Cultural Alternativo</option>
+                </optgroup>
+                <optgroup label="🏘️ Barrios">
+                  <option value="Barrio San Benito">Barrio San Benito</option>
+                  <option value="Barrio Pirayuí">Barrio Pirayuí</option>
+                  <option value="Barrio Quilmes">Barrio Quilmes</option>
+                  <option value="Barrio Esperanza">Barrio Esperanza</option>
+                  <option value="Barrio San Cayetano">Barrio San Cayetano</option>
+                </optgroup>
+                <optgroup label="🌊 Zona Costera">
+                  <option value="Playa Arazaty">Playa Arazaty</option>
+                  <option value="Punta Arazaty">Punta Arazaty</option>
+                  <option value="Riachuelo">Riachuelo</option>
+                  <option value="Puerto de Corrientes">Puerto de Corrientes</option>
+                </optgroup>
+                <optgroup label="🏞️ Interior">
+                  <option value="Empedrado">Empedrado</option>
+                  <option value="Bella Vista">Bella Vista</option>
+                  <option value="Goya">Goya</option>
+                  <option value="Mercedes">Mercedes</option>
+                  <option value="Paso de los Libres">Paso de los Libres</option>
+                  <option value="Monte Caseros">Monte Caseros</option>
+                </optgroup>
+                <optgroup label="✍️ Personalizada">
+                  <option value="custom">Escribir ubicación personalizada...</option>
+                </optgroup>
+              </select>
+              <!-- Custom location input (shown when "custom" is selected) -->
+              <input
+                v-if="postLocation === 'custom'"
+                v-model="customLocation"
+                type="text"
+                placeholder="Escribir ubicación..."
+                class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500 flex-1 sm:flex-none ml-2"
                 :maxlength="POST_CONSTRAINTS.MAX_LOCATION_LENGTH"
               />
             </div>
@@ -156,6 +202,7 @@ const emit = defineEmits<{
 const postContent = ref('')
 const postPrivacy = ref<PostPrivacy>('public')
 const postLocation = ref('')
+const customLocation = ref('')
 const postTags = ref('')
 const showAdvancedOptions = ref(false)
 const isSubmitting = ref(false)
@@ -211,6 +258,7 @@ const resetForm = () => {
   postContent.value = ''
   postPrivacy.value = 'public'
   postLocation.value = ''
+  customLocation.value = ''
   postTags.value = ''
   showAdvancedOptions.value = false
   error.value = ''
@@ -226,11 +274,16 @@ const createPost = async () => {
 
     console.log('📝 Creating post for user:', authUser.value.uid)
 
+    // Determine the final location value
+    const finalLocation = postLocation.value === 'custom' 
+      ? customLocation.value.trim() 
+      : postLocation.value.trim()
+    
     const postData: CreatePostData = {
       type: 'text',
       content: postContent.value.trim(),
       privacy: postPrivacy.value,
-      location: postLocation.value.trim() || undefined,
+      location: finalLocation || undefined,
       tags: parseTags(postTags.value)
     }
 

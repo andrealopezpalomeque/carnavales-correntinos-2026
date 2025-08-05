@@ -17,13 +17,11 @@
           <!-- WebP sources with responsive sizes -->
           <source
             :srcset="getResponsiveSrcset(image.basename, 'webp')"
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 1152px"
             type="image/webp"
           />
           <!-- PNG fallback with responsive sizes -->
           <source
             :srcset="getResponsiveSrcset(image.basename, 'png')"
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 1152px"
             type="image/png"
           />
           <!-- Fallback img tag -->
@@ -90,7 +88,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 const images = ref([
   {
     basename: 'carnaval1',
-    src: '/images/carnaval1@2x.png',
+    src: '/images/carnaval1@1x.png',
     alt: 'Inaguración carnavales 2025',
     title: 'Inaguración carnavales 2025',
     description: 'Disfrutando desde el minuto uno',
@@ -99,7 +97,7 @@ const images = ref([
   },
   {
     basename: 'carnaval2',
-    src: '/images/carnaval2@2x.png',
+    src: '/images/carnaval2@1x.png',
     alt: 'Primera aparición en el Palco Oficial',
     title: 'Primera aparición en el Palco Oficial',
     description: 'Inicio de una larga aventura',
@@ -108,7 +106,7 @@ const images = ref([
   },
   {
     basename: 'carnaval3',
-    src: '/images/carnaval3@2x.png',
+    src: '/images/carnaval3@1x.png',
     alt: 'Tomando alguito',
     title: 'Tomando alguito',
     description: 'Un momento de relax y diversión',
@@ -117,7 +115,7 @@ const images = ref([
   },
   {
     basename: 'carnaval4',
-    src: '/images/carnaval4@2x.png',
+    src: '/images/carnaval4@1x.png',
     alt: 'Celebrando en cada rincón',
     title: 'Celebrando en cada rincón',
     description: 'La alegría del carnaval en su máxima expresión',
@@ -131,7 +129,7 @@ const images = ref([
   },
   {
     basename: 'carnaval5',
-    src: '/images/carnaval5@2x.png',
+    src: '/images/carnaval5@1x.png',
     alt: 'Del 🐓, siempre',
     title: 'Del 🐓, siempre',
     description: '✋',
@@ -140,7 +138,7 @@ const images = ref([
   },
   {
     basename: 'carnaval6',
-    src: '/images/carnaval6@2x.png',
+    src: '/images/carnaval6@1x.png',
     alt: 'Piel de gallo',
     title: 'Piel de gallo',
     description: 'Contra todo pronóstico',
@@ -149,7 +147,7 @@ const images = ref([
   },
   {
     basename: 'carnaval7',
-    src: '/images/carnaval7@2x.png',
+    src: '/images/carnaval7@1x.png',
     alt: 'Carnavalero, no importa el color',
     title: 'Carnavalero, no importa el color',
     description: '🥳',
@@ -158,7 +156,7 @@ const images = ref([
   },
   {
     basename: 'carnaval8',
-    src: '/images/carnaval8@2x.png',
+    src: '/images/carnaval8@1x.png',
     alt: 'Probando la AVENIDA',
     title: 'Probando la AVENIDA',
     description: '2026?',
@@ -172,7 +170,7 @@ const images = ref([
   },
   {
     basename: 'carnaval9',
-    src: '/images/carnaval9@2x.png',
+    src: '/images/carnaval9@1x.png',
     alt: 'Nos queda pintado',
     title: 'Nos queda pintado',
     description: '🎭',
@@ -181,7 +179,7 @@ const images = ref([
   },
   {
     basename: 'carnaval10',
-    src: '/images/carnaval10@2x.png',
+    src: '/images/carnaval10@1x.png',
     alt: 'Carnaval toda la vida',
     title: 'Carnaval toda la vida',
     description: '💙🧡',
@@ -195,7 +193,7 @@ const images = ref([
   },
   {
     basename: 'carnaval11',
-    src: '/images/carnaval11@2x.png',
+    src: '/images/carnaval11@1x.png',
     alt: 'Nueva skin',
     title: 'Nueva skin',
     description: '🤫',
@@ -204,7 +202,7 @@ const images = ref([
   },
   {
     basename: 'carnaval12',
-    src: '/images/carnaval12@2x.png',
+    src: '/images/carnaval12@1x.png',
     alt: 'CORSITO? SIEMPRE',
     title: 'CORSITO? SIEMPRE',
     description: '💙🧡',
@@ -273,9 +271,9 @@ const currentSlide = ref(0)
 const getResponsiveSrcset = (basename, format) => {
   const extension = format === 'webp' ? 'webp' : 'png'
   return [
-    `/images/${basename}@1x.${extension} 1x`,
+    `/images/${basename}@2x.${extension} 2x`,
     `/images/${basename}@1.5x.${extension} 1.5x`,
-    `/images/${basename}@2x.${extension} 2x`
+    `/images/${basename}@1x.${extension} 1x`
   ].join(', ')
 }
 

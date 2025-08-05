@@ -14,7 +14,7 @@ export const useUserInteractions = () => {
   const error = ref<string | null>(null)
   
   // Composables
-  const { authUser } = useAuthEnhanced()
+  const { authUser, refreshUserProfile } = useAuthEnhanced()
   const { notifySuccess, notifyError } = useNotifications()
 
   // Helper to clear error
@@ -33,10 +33,18 @@ export const useUserInteractions = () => {
       isLoading.value = true
       clearError()
       
+      console.log('👍 Starting like user process:', authUser.value.uid, '->', targetUserId)
       const result = await dbService.likeUser(authUser.value.uid, targetUserId)
+      console.log('👍 Like result:', result)
       
       if (result.success) {
         notifySuccess('¡Like enviado!', 'Has dado like a este usuario')
+        // Force refresh of profile after a short delay to ensure DB update completed
+        setTimeout(async () => {
+          console.log('🔄 Refreshing user profile after like...')
+          const refreshResult = await refreshUserProfile()
+          console.log('✅ Profile refreshed:', refreshResult)
+        }, 3000)
         return true
       } else {
         error.value = result.error || 'Error al dar like'
@@ -66,6 +74,10 @@ export const useUserInteractions = () => {
       
       if (result.success) {
         notifySuccess('Like eliminado', 'Has quitado tu like de este usuario')
+        // Force refresh of profile after a short delay to ensure DB update completed
+        setTimeout(async () => {
+          await refreshUserProfile()
+        }, 3000)
         return true
       } else {
         error.value = result.error || 'Error al quitar like'
@@ -96,6 +108,8 @@ export const useUserInteractions = () => {
       
       if (result.success) {
         notifySuccess('Solicitud enviada', 'Solicitud de amistad enviada exitosamente')
+        // Refresh current user's profile to update interaction counts
+        await refreshUserProfile()
         return true
       } else {
         error.value = result.error || 'Error al enviar solicitud'
@@ -127,6 +141,8 @@ export const useUserInteractions = () => {
         const message = response === 'accepted' ? 'Solicitud aceptada' : 'Solicitud rechazada'
         const description = response === 'accepted' ? 'Ahora son amigos' : 'Solicitud rechazada'
         notifySuccess(message, description)
+        // Refresh current user's profile to update interaction counts
+        await refreshUserProfile()
         return true
       } else {
         error.value = result.error || 'Error al responder solicitud'
@@ -156,6 +172,8 @@ export const useUserInteractions = () => {
       
       if (result.success) {
         notifySuccess('Amistad eliminada', 'Ya no son amigos')
+        // Refresh current user's profile to update interaction counts
+        await refreshUserProfile()
         return true
       } else {
         error.value = result.error || 'Error al eliminar amistad'

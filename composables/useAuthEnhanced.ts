@@ -51,7 +51,8 @@ const defaultPreferences: UserPreferences = {
   },
   privacy: {
     showEmail: false,
-    showProfile: true
+    showProfile: true,
+    showBio: true
   }
 }
 
@@ -164,8 +165,19 @@ export const useAuthEnhanced = () => {
       
       if (userDoc.exists()) {
         const data = userDoc.data()
+        
+        // Migrate existing users to have the showBio setting
+        let preferences = data.preferences || {}
+        if (!preferences.privacy) {
+          preferences.privacy = {}
+        }
+        if (preferences.privacy.showBio === undefined) {
+          preferences.privacy.showBio = true // Default to true for existing users
+        }
+        
         return {
           ...data,
+          preferences,
           createdAt: data.createdAt?.toDate() || new Date(),
           updatedAt: data.updatedAt?.toDate() || new Date(),
           lastLoginAt: data.lastLoginAt?.toDate() || new Date()

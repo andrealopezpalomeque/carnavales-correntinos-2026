@@ -16,6 +16,8 @@ export interface UserProfile {
   firstName: string | null
   lastName: string | null
   bio: string | null
+  favoriteComparsa: Comparsa | null
+  favoriteAgrupacion: AgrupacionMusical | null
   preferences: UserPreferences
   role: UserRole
   isActive: boolean
@@ -39,8 +41,15 @@ export interface UserPreferences {
   privacy: {
     showEmail: boolean
     showProfile: boolean
+    showBio: boolean
   }
 }
+
+// Comparsas disponibles
+export type Comparsa = 'Ara Berá' | 'Sapucay' | 'Copacabana' | 'Arandú Beleza'
+
+// Agrupaciones musicales disponibles
+export type AgrupacionMusical = 'Samba Show' | 'Samba Total' | 'Imperio Bahiano' | 'Kamandukahia' | 'Sambanda'
 
 // Roles de usuario
 export type UserRole = 'admin' | 'moderator' | 'user'
@@ -65,12 +74,16 @@ export interface CreateUserProfileData {
   firstName?: string
   lastName?: string
   bio?: string
+  favoriteComparsa?: Comparsa
+  favoriteAgrupacion?: AgrupacionMusical
   preferences?: Partial<UserPreferences>
 }
 
 export interface UpdateUserProfileData extends CreateUserProfileData {
   displayName?: string
   photoURL?: string
+  favoriteComparsa?: Comparsa
+  favoriteAgrupacion?: AgrupacionMusical
 }
 
 // Respuesta de operaciones

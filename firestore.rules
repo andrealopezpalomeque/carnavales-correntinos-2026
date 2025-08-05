@@ -46,18 +46,19 @@ service cloud.firestore {
     
     function isValidUserUpdate(data) {
       // Fields that can be updated by user
-      let allowedFields = ['displayName', 'firstName', 'lastName', 'bio', 'preferences', 'photoURL', 'updatedAt', 'lastLoginAt', 'isNewUser'];
+      let allowedFields = ['displayName', 'firstName', 'lastName', 'bio', 'favoriteComparsa', 'favoriteAgrupacion', 'preferences', 'photoURL', 'updatedAt', 'lastLoginAt', 'isNewUser', 'interactions'];
       
       // Check if only allowed fields are being updated
       return data.diff(resource.data).affectedKeys().hasOnly(allowedFields);
     }
     
     function isValidPreferences(preferences) {
-      return preferences.keys().hasAll(['theme', 'language', 'notifications', 'privacy']) &&
-             preferences.theme in ['light', 'dark', 'system'] &&
-             preferences.language in ['es', 'en'] &&
-             preferences.notifications.keys().hasAll(['email', 'push', 'marketing']) &&
-             preferences.privacy.keys().hasAll(['showEmail', 'showProfile']);
+      // More flexible preferences validation
+      return preferences is map &&
+             (!preferences.keys().hasAny(['theme']) || preferences.theme in ['light', 'dark', 'system']) &&
+             (!preferences.keys().hasAny(['language']) || preferences.language in ['es', 'en']) &&
+             (!preferences.keys().hasAny(['notifications']) || preferences.notifications is map) &&
+             (!preferences.keys().hasAny(['privacy']) || preferences.privacy is map);
     }
 
     // Users collection
@@ -80,12 +81,32 @@ service cloud.firestore {
       allow update: if isEmailWhitelisted() &&
                        isOwner(userId) && 
                        isValidUserUpdate(request.resource.data) &&
-                       // User cannot change their own role or active status
-                       request.resource.data.role == resource.data.role &&
-                       request.resource.data.isActive == resource.data.isActive &&
+                       // User cannot change their own role or active status (if they exist)
+                       (!('role' in request.resource.data) || request.resource.data.role == resource.data.role) &&
+                       (!('isActive' in request.resource.data) || request.resource.data.isActive == resource.data.isActive) &&
                        // Validate preferences structure if being updated
                        (!request.resource.data.keys().hasAny(['preferences']) || 
                         isValidPreferences(request.resource.data.preferences));
+      
+      // Special rule for interaction count updates - only allow interactions and updatedAt fields
+      allow update: if isEmailWhitelisted() &&
+                       isOwner(userId) &&
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['interactions', 'updatedAt']) &&
+                       // Ensure core fields remain unchanged (if they exist in the update)
+                       (!('role' in request.resource.data) || request.resource.data.role == resource.data.role) &&
+                       (!('isActive' in request.resource.data) || request.resource.data.isActive == resource.data.isActive) &&
+                       (!('email' in request.resource.data) || request.resource.data.email == resource.data.email) &&
+                       (!('uid' in request.resource.data) || request.resource.data.uid == resource.data.uid);
+      
+      // More permissive rule for basic profile updates
+      allow update: if isEmailWhitelisted() &&
+                       isOwner(userId) &&
+                       // Only allow safe profile fields to be updated
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+                         'displayName', 'firstName', 'lastName', 'bio', 
+                         'favoriteComparsa', 'favoriteAgrupacion', 'preferences', 
+                         'photoURL', 'updatedAt', 'lastLoginAt', 'isNewUser'
+                       ]);
       
       // Admin updates: Admins can update any user (including role and active status)
       allow update: if isAdmin() && 
@@ -152,12 +173,19 @@ service cloud.firestore {
     
     // User-generated content with ownership
     match /posts/{postId} {
-      // Posts: authenticated users can read, users can create their own, owners can update/delete
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && 
-                       request.resource.data.authorId == request.auth.uid;
-      allow update, delete: if isAuthenticated() && 
-                              (resource.data.authorId == request.auth.uid || isModerator());
+      // Posts: authenticated whitelisted users can read, users can create their own, owners can update/delete
+      allow read: if isEmailWhitelisted();
+      allow create: if isEmailWhitelisted() && 
+                       request.resource.data.authorId == request.auth.uid &&
+                       request.resource.data.type in ['text', 'image', 'mixed'] &&
+                       request.resource.data.privacy in ['public', 'friends', 'comparsa', 'agrupacion'];
+      allow update: if isEmailWhitelisted() && 
+                       resource.data.authorId == request.auth.uid &&
+                       // Allow updating content, privacy, tags, location, but not authorId or type
+                       request.resource.data.authorId == resource.data.authorId &&
+                       request.resource.data.type == resource.data.type;
+      allow delete: if isEmailWhitelisted() && 
+                       (resource.data.authorId == request.auth.uid || isModerator());
     }
     
     match /comments/{commentId} {
@@ -196,6 +224,8 @@ service cloud.firestore {
       allow read: if isEmailWhitelisted() && 
                      (request.auth.uid == resource.data.fromUserId || 
                       request.auth.uid == resource.data.toUserId);
+      // Allow list operations for whitelisted users with proper filtering
+      allow list: if isEmailWhitelisted();
       // Users can create likes from themselves to others
       allow create: if isEmailWhitelisted() && 
                        request.auth.uid == request.resource.data.fromUserId &&
@@ -210,6 +240,8 @@ service cloud.firestore {
       allow read: if isEmailWhitelisted() && 
                      (request.auth.uid == resource.data.fromUserId || 
                       request.auth.uid == resource.data.toUserId);
+      // Allow list operations for whitelisted users
+      allow list: if isEmailWhitelisted();
       // Users can create friend requests from themselves to others
       allow create: if isEmailWhitelisted() && 
                        request.auth.uid == request.resource.data.fromUserId &&
@@ -230,8 +262,10 @@ service cloud.firestore {
       allow read: if isEmailWhitelisted() && 
                      (request.auth.uid == resource.data.user1Id || 
                       request.auth.uid == resource.data.user2Id);
-      // Only the system can create friendships (through friend request acceptance)
-      allow create: if false;
+      // Allow list operations for whitelisted users
+      allow list: if isEmailWhitelisted();
+      // System can create friendships (through friend request acceptance)
+      allow create: if isEmailWhitelisted();
       // Users can delete friendships they're part of (to unfriend)
       allow delete: if isEmailWhitelisted() && 
                        (request.auth.uid == resource.data.user1Id || 
@@ -250,6 +284,37 @@ service cloud.firestore {
       // Users can delete their own follows
       allow delete: if isEmailWhitelisted() && 
                        request.auth.uid == resource.data.followerId;
+    }
+
+    // Post interactions
+    match /postLikes/{likeId} {
+      // Users can read likes on posts they can see, create their own likes, delete their own likes
+      allow read: if isEmailWhitelisted();
+      allow create: if isEmailWhitelisted() && 
+                       request.auth.uid == request.resource.data.userId &&
+                       request.resource.data.type == 'like';
+      allow delete: if isEmailWhitelisted() && 
+                       request.auth.uid == resource.data.userId;
+    }
+
+    match /postComments/{commentId} {
+      // Users can read comments on posts they can see, create their own comments, update/delete their own
+      allow read: if isEmailWhitelisted();
+      allow create: if isEmailWhitelisted() && 
+                       request.auth.uid == request.resource.data.authorId;
+      allow update: if isEmailWhitelisted() && 
+                       request.auth.uid == resource.data.authorId;
+      allow delete: if isEmailWhitelisted() && 
+                       (request.auth.uid == resource.data.authorId || isModerator());
+    }
+
+    match /postShares/{shareId} {
+      // Users can read shares, create their own shares, delete their own shares
+      allow read: if isEmailWhitelisted();
+      allow create: if isEmailWhitelisted() && 
+                       request.auth.uid == request.resource.data.userId;
+      allow delete: if isEmailWhitelisted() && 
+                       request.auth.uid == resource.data.userId;
     }
     
     // Fallback rule - deny everything else

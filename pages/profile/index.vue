@@ -90,6 +90,23 @@
               />
             </button>
           </div>
+          
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-sm font-medium text-gray-900">Mostrar biografía</h4>
+              <p class="text-sm text-gray-500">Permite que otros usuarios vean tu biografía</p>
+            </div>
+            <button
+              @click="toggleBioVisibility"
+              :class="userProfile?.preferences?.privacy?.showBio ? 'bg-green-600' : 'bg-gray-200'"
+              class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            >
+              <span
+                :class="userProfile?.preferences?.privacy?.showBio ? 'translate-x-5' : 'translate-x-0'"
+                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+              />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -190,20 +207,6 @@
             </svg>
             <span>Explorar Usuarios</span>
           </NuxtLink>
-          <button
-            @click="loadFriendRequests"
-            :disabled="isLoadingRequests"
-            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors text-sm flex items-center space-x-2"
-          >
-            <svg v-if="isLoadingRequests" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-            </svg>
-            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-            </svg>
-            <span>{{ isLoadingRequests ? 'Actualizando...' : 'Actualizar Solicitudes' }}</span>
-          </button>
         </div>
       </div>
 
@@ -295,7 +298,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 
 // Page meta
 definePageMeta({
@@ -514,6 +517,22 @@ const toggleEmailVisibility = async () => {
   })
 }
 
+const toggleBioVisibility = async () => {
+  if (!userProfile.value) return
+  
+  const newValue = !userProfile.value.preferences.privacy.showBio
+  
+  await updateUserProfile({
+    preferences: {
+      ...userProfile.value.preferences,
+      privacy: {
+        ...userProfile.value.preferences.privacy,
+        showBio: newValue
+      }
+    }
+  })
+}
+
 const showDeactivateConfirmation = () => {
   showDeactivateModal.value = true
 }
@@ -643,9 +662,35 @@ const formatDate = (date: Date | string): string => {
   })
 }
 
-// Load friend requests on mount
+// Auto-refresh functions
+const refreshProfileData = async () => {
+  // Refresh user profile to get updated interaction counts
+  await updateUserProfile({})
+  // Refresh friend requests
+  await loadFriendRequests()
+}
+
+// Load friend requests on mount and set up auto-refresh
 onMounted(() => {
   loadFriendRequests()
+  
+  // Refresh every 2 minutes (less aggressive)
+  const interval = setInterval(loadFriendRequests, 120000)
+  
+  // Refresh when page becomes visible again
+  const handleVisibilityChange = () => {
+    if (!document.hidden) {
+      refreshProfileData()
+    }
+  }
+  
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+  
+  // Cleanup interval and event listener on unmount
+  onUnmounted(() => {
+    clearInterval(interval)
+    document.removeEventListener('visibilitychange', handleVisibilityChange)
+  })
 })
 
 // Authentication is handled by the 'auth' middleware

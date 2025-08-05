@@ -134,6 +134,46 @@
           />
         </div>
 
+        <!-- Carnival Preferences -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Favorite Comparsa -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Comparsa Favorita
+            </label>
+            <select
+              v-model="formData.favoriteComparsa"
+              :disabled="!isEditMode"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-50"
+            >
+              <option value="">Seleccionar comparsa...</option>
+              <option value="Ara Berá">Ara Berá</option>
+              <option value="Sapucay">Sapucay</option>
+              <option value="Copacabana">Copacabana</option>
+              <option value="Arandú Beleza">Arandú Beleza</option>
+            </select>
+          </div>
+
+          <!-- Favorite Agrupacion -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Agrupación Musical Favorita
+            </label>
+            <select
+              v-model="formData.favoriteAgrupacion"
+              :disabled="!isEditMode"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-50"
+            >
+              <option value="">Seleccionar agrupación...</option>
+              <option value="Samba Show">Samba Show</option>
+              <option value="Samba Total">Samba Total</option>
+              <option value="Imperio Bahiano">Imperio Bahiano</option>
+              <option value="Kamandukahia">Kamandukahia</option>
+              <option value="Sambanda">Sambanda</option>
+            </select>
+          </div>
+        </div>
+
         <!-- Preferences -->
         <div v-if="isEditMode" class="border-t pt-4">
           <h4 class="text-lg font-medium text-gray-900 mb-3">Preferencias</h4>
@@ -311,6 +351,8 @@ const formData = ref<UpdateUserProfileData>({
   firstName: '',
   lastName: '',
   bio: '',
+  favoriteComparsa: undefined,
+  favoriteAgrupacion: undefined,
   preferences: {
     theme: 'system',
     language: 'es',
@@ -338,6 +380,8 @@ watch(userProfile, (newProfile) => {
       firstName: newProfile.firstName || '',
       lastName: newProfile.lastName || '',
       bio: newProfile.bio || '',
+      favoriteComparsa: newProfile.favoriteComparsa || undefined,
+      favoriteAgrupacion: newProfile.favoriteAgrupacion || undefined,
       preferences: { ...newProfile.preferences }
     }
   }
@@ -360,6 +404,8 @@ const cancelEdit = () => {
       firstName: userProfile.value.firstName || '',
       lastName: userProfile.value.lastName || '',
       bio: userProfile.value.bio || '',
+      favoriteComparsa: userProfile.value.favoriteComparsa || undefined,
+      favoriteAgrupacion: userProfile.value.favoriteAgrupacion || undefined,
       preferences: { ...userProfile.value.preferences }
     }
   }

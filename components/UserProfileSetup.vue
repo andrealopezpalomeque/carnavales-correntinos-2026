@@ -112,6 +112,48 @@
             />
           </div>
 
+          <!-- Carnival Preferences -->
+          <div class="border-t pt-4">
+            <h3 class="text-lg font-medium text-gray-900 mb-3">🎉 Preferencias de Carnaval</h3>
+            
+            <!-- Favorite Comparsa -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                ¿Cuál es tu comparsa favorita?
+              </label>
+              <select
+                v-model="formData.favoriteComparsa"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="">Seleccionar comparsa...</option>
+                <option value="Ara Berá">Ara Berá</option>
+                <option value="Sapucay">Sapucay</option>
+                <option value="Copacabana">Copacabana</option>
+                <option value="Arandú Beleza">Arandú Beleza</option>
+              </select>
+              <p class="text-xs text-gray-500 mt-1">Las cuatro comparsas que compiten por el título principal</p>
+            </div>
+
+            <!-- Favorite Agrupacion -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                ¿Cuál es tu agrupación musical favorita?
+              </label>
+              <select
+                v-model="formData.favoriteAgrupacion"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="">Seleccionar agrupación...</option>
+                <option value="Samba Show">Samba Show</option>
+                <option value="Samba Total">Samba Total</option>
+                <option value="Imperio Bahiano">Imperio Bahiano</option>
+                <option value="Kamandukahia">Kamandukahia</option>
+                <option value="Sambanda">Sambanda</option>
+              </select>
+              <p class="text-xs text-gray-500 mt-1">Agrupaciones con batería y estilo samba enredo</p>
+            </div>
+          </div>
+
           <!-- Preferences -->
           <div class="border-t pt-4">
             <h3 class="text-lg font-medium text-gray-900 mb-3">Preferencias</h3>
@@ -248,6 +290,8 @@ const formData = ref<UpdateUserProfileData>({
   firstName: '',
   lastName: '',
   bio: '',
+  favoriteComparsa: undefined,
+  favoriteAgrupacion: undefined,
   preferences: {
     theme: 'system',
     language: 'es',
@@ -269,7 +313,9 @@ const progressPercentage = computed(() => {
     formData.value.displayName,
     formData.value.firstName,
     formData.value.lastName,
-    formData.value.bio
+    formData.value.bio,
+    formData.value.favoriteComparsa,
+    formData.value.favoriteAgrupacion
   ]
   
   const filledFields = fields.filter(field => field && field.trim() !== '').length

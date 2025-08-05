@@ -117,9 +117,34 @@
                 </div>
 
                 <!-- Bio -->
-                <div v-if="userProfile.bio" class="mt-4">
+                <div v-if="userProfile.bio && userProfile.preferences?.privacy?.showBio" class="mt-4">
                   <h3 class="text-lg font-semibold text-gray-900 mb-2">Sobre mí</h3>
                   <p class="text-gray-700">{{ userProfile.bio }}</p>
+                </div>
+
+                <!-- Carnival Preferences -->
+                <div v-if="userProfile.favoriteComparsa || userProfile.favoriteAgrupacion" class="mt-4">
+                  <h3 class="text-lg font-semibold text-gray-900 mb-3">🎉 Preferencias de Carnaval</h3>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div v-if="userProfile.favoriteComparsa" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <div class="flex items-center space-x-2">
+                        <span class="text-2xl">🎆</span>
+                        <div>
+                          <div class="text-sm font-medium text-yellow-800">Comparsa Favorita</div>
+                          <div class="text-lg font-bold text-yellow-900">{{ userProfile.favoriteComparsa }}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-if="userProfile.favoriteAgrupacion" class="bg-pink-50 border border-pink-200 rounded-lg p-4">
+                      <div class="flex items-center space-x-2">
+                        <span class="text-2xl">🎵</span>
+                        <div>
+                          <div class="text-sm font-medium text-pink-800">Agrupación Musical</div>
+                          <div class="text-lg font-bold text-pink-900">{{ userProfile.favoriteAgrupacion }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

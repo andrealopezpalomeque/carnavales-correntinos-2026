@@ -394,9 +394,22 @@ export class DatabaseService {
         createdAt: serverTimestamp()
       })
 
-      // Update interaction counts
-      await this.updateUserInteractionCounts(fromUserId)
-      await this.updateUserInteractionCounts(toUserId)
+      // Update interaction counts with a small delay to ensure document is committed
+      console.log(`🔄 Updating interaction counts for users ${fromUserId} and ${toUserId}`)
+      
+      // Use a more robust approach with proper error handling
+      const updateCounts = async () => {
+        try {
+          console.log('🔄 Starting delayed interaction count update...')
+          await this.updateUserInteractionCounts(fromUserId)
+          await this.updateUserInteractionCounts(toUserId)
+          console.log('✅ Delayed interaction count update completed')
+        } catch (error) {
+          console.error('❌ Error in delayed interaction count update:', error)
+        }
+      }
+      
+      setTimeout(updateCounts, 500)
 
       return { success: true, data: { id: likeDoc.id, ...likeData } }
     } catch (error: any) {
@@ -427,9 +440,22 @@ export class DatabaseService {
       const likeDoc = querySnapshot.docs[0]
       await deleteDoc(likeDoc.ref)
 
-      // Update interaction counts
-      await this.updateUserInteractionCounts(fromUserId)
-      await this.updateUserInteractionCounts(toUserId)
+      // Update interaction counts with a small delay to ensure document is committed
+      console.log(`🔄 Updating interaction counts for users ${fromUserId} and ${toUserId}`)
+      
+      // Use a more robust approach with proper error handling
+      const updateCounts = async () => {
+        try {
+          console.log('🔄 Starting delayed interaction count update...')
+          await this.updateUserInteractionCounts(fromUserId)
+          await this.updateUserInteractionCounts(toUserId)
+          console.log('✅ Delayed interaction count update completed')
+        } catch (error) {
+          console.error('❌ Error in delayed interaction count update:', error)
+        }
+      }
+      
+      setTimeout(updateCounts, 500)
 
       return { success: true }
     } catch (error: any) {
@@ -470,27 +496,31 @@ export class DatabaseService {
 
   async getUserLikes(userId: string, type: 'given' | 'received' = 'received'): Promise<UserLike[]> {
     try {
+      console.log(`📖 Getting ${type} likes for user ${userId}`)
       const db = this.ensureFirestore()
       const likesRef = collection(db, 'userLikes')
       const field = type === 'given' ? 'fromUserId' : 'toUserId'
       
+      // Remove orderBy to avoid index requirement, sort client-side
       const q = query(
         likesRef,
-        where(field, '==', userId),
-        orderBy('createdAt', 'desc')
+        where(field, '==', userId)
       )
       
       const querySnapshot = await getDocs(q)
+      console.log(`📖 Found ${querySnapshot.docs.length} ${type} likes for user ${userId}`)
       
-      return querySnapshot.docs.map(doc => {
-        const data = doc.data()
-        return {
-          id: doc.id,
-          fromUserId: data.fromUserId,
-          toUserId: data.toUserId,
-          createdAt: data.createdAt?.toDate() || new Date()
-        }
-      })
+      return querySnapshot.docs
+        .map(doc => {
+          const data = doc.data()
+          return {
+            id: doc.id,
+            fromUserId: data.fromUserId,
+            toUserId: data.toUserId,
+            createdAt: data.createdAt?.toDate() || new Date()
+          }
+        })
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
     } catch (error) {
       console.error('Error getting user likes:', error)
       return []
@@ -580,9 +610,19 @@ export class DatabaseService {
           createdAt: serverTimestamp()
         })
 
-        // Update interaction counts
-        await this.updateUserInteractionCounts(requestData.fromUserId)
-        await this.updateUserInteractionCounts(requestData.toUserId)
+        // Update interaction counts with a small delay to ensure document is committed
+        const updateCounts = async () => {
+          try {
+            console.log('🔄 Starting delayed friend count update...')
+            await this.updateUserInteractionCounts(requestData.fromUserId)
+            await this.updateUserInteractionCounts(requestData.toUserId)
+            console.log('✅ Delayed friend count update completed')
+          } catch (error) {
+            console.error('❌ Error in delayed friend count update:', error)
+          }
+        }
+        
+        setTimeout(updateCounts, 500)
       }
 
       return { success: true }
@@ -643,26 +683,28 @@ export class DatabaseService {
       const requestsRef = collection(db, 'friendRequests')
       const field = type === 'sent' ? 'fromUserId' : 'toUserId'
       
+      // Get all requests for this user, then filter client-side to avoid index requirement
       const q = query(
         requestsRef,
-        where(field, '==', userId),
-        where('status', '==', 'pending'),
-        orderBy('createdAt', 'desc')
+        where(field, '==', userId)
       )
       
       const querySnapshot = await getDocs(q)
       
-      return querySnapshot.docs.map(doc => {
-        const data = doc.data()
-        return {
-          id: doc.id,
-          fromUserId: data.fromUserId,
-          toUserId: data.toUserId,
-          status: data.status,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date()
-        }
-      })
+      return querySnapshot.docs
+        .map(doc => {
+          const data = doc.data()
+          return {
+            id: doc.id,
+            fromUserId: data.fromUserId,
+            toUserId: data.toUserId,
+            status: data.status,
+            createdAt: data.createdAt?.toDate() || new Date(),
+            updatedAt: data.updatedAt?.toDate() || new Date()
+          }
+        })
+        .filter(request => request.status === 'pending')
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
     } catch (error) {
       console.error('Error getting friend requests:', error)
       return []
@@ -714,6 +756,7 @@ export class DatabaseService {
 
   async getUserFriends(userId: string): Promise<UserProfile[]> {
     try {
+      console.log(`👥 Getting friends for user ${userId}`)
       const db = this.ensureFirestore()
       const friendshipsRef = collection(db, 'friendships')
       
@@ -738,6 +781,8 @@ export class DatabaseService {
         const data = doc.data()
         friendIds.add(data.user1Id)
       })
+      
+      console.log(`👥 Found ${friendIds.size} friends for user ${userId}`)
       
       // Get friend profiles
       const friends: UserProfile[] = []
@@ -766,9 +811,19 @@ export class DatabaseService {
       const db = this.ensureFirestore()
       await deleteDoc(doc(db, 'friendships', friendship.id!))
 
-      // Update interaction counts
-      await this.updateUserInteractionCounts(user1Id)
-      await this.updateUserInteractionCounts(user2Id)
+      // Update interaction counts with a small delay to ensure document is committed
+      const updateCounts = async () => {
+        try {
+          console.log('🔄 Starting delayed remove friend count update...')
+          await this.updateUserInteractionCounts(user1Id)
+          await this.updateUserInteractionCounts(user2Id)
+          console.log('✅ Delayed remove friend count update completed')
+        } catch (error) {
+          console.error('❌ Error in delayed remove friend count update:', error)
+        }
+      }
+      
+      setTimeout(updateCounts, 500)
 
       return { success: true }
     } catch (error: any) {
@@ -778,13 +833,21 @@ export class DatabaseService {
   }
 
   // Update user interaction counts
-  async updateUserInteractionCounts(userId: string): Promise<void> {
+  async updateUserInteractionCounts(userId: string): Promise<UserInteractions | null> {
     try {
+      console.log(`🔄 Starting interaction count update for user ${userId}`)
+      
       const [likesReceived, likesGiven, friends] = await Promise.all([
         this.getUserLikes(userId, 'received'),
         this.getUserLikes(userId, 'given'),
         this.getUserFriends(userId)
       ])
+
+      console.log(`📊 Retrieved interaction data for user ${userId}:`, {
+        likesReceived: likesReceived.length,
+        likesGiven: likesGiven.length,
+        friends: friends.length
+      })
 
       const interactions: UserInteractions = {
         likesReceived: likesReceived.length,
@@ -794,9 +857,28 @@ export class DatabaseService {
         followingCount: 0  // Will implement later
       }
 
-      await this.updateUserProfile(userId, { interactions })
+      console.log(`📝 Attempting to update user profile for ${userId} with interactions:`, interactions)
+      
+      // Use the generic update method directly to avoid any validation issues
+      const db = this.ensureFirestore()
+      const docRef = doc(db, 'users', userId)
+      
+      await updateDoc(docRef, {
+        interactions,
+        updatedAt: serverTimestamp()
+      })
+      
+      console.log(`✅ Updated interaction counts for user ${userId}:`, interactions)
+      return interactions
     } catch (error) {
       console.error('Error updating interaction counts:', error)
+      console.error('Error details:', {
+        userId,
+        error: error.message,
+        code: error.code,
+        stack: error.stack
+      })
+      return null
     }
   }
 

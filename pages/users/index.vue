@@ -140,9 +140,25 @@
                   {{ user.email }}
                 </p>
 
-                <p v-if="user.bio" class="text-sm text-gray-600 mt-1 line-clamp-2">
+                <p v-if="user.bio && user.preferences?.privacy?.showBio" class="text-sm text-gray-600 mt-1 line-clamp-2">
                   {{ user.bio }}
                 </p>
+
+                <!-- Carnival Preferences -->
+                <div v-if="user.favoriteComparsa || user.favoriteAgrupacion" class="flex flex-wrap gap-1 mt-2">
+                  <span 
+                    v-if="user.favoriteComparsa"
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+                  >
+                    🎆 {{ user.favoriteComparsa }}
+                  </span>
+                  <span 
+                    v-if="user.favoriteAgrupacion"
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-800"
+                  >
+                    🎵 {{ user.favoriteAgrupacion }}
+                  </span>
+                </div>
 
                 <!-- Status Badges -->
                 <div class="flex items-center space-x-2 mt-2">
@@ -305,7 +321,7 @@
           </div>
 
           <!-- Bio -->
-          <div v-if="selectedUser.bio">
+          <div v-if="selectedUser.bio && selectedUser.preferences?.privacy?.showBio">
             <h5 class="text-lg font-semibold text-gray-900 mb-2">Sobre mí</h5>
             <p class="text-gray-700">{{ selectedUser.bio }}</p>
           </div>

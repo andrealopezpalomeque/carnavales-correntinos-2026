@@ -163,9 +163,13 @@ const loadRelationshipStatus = async () => {
 const handleLikeToggle = async () => {
   if (isCurrentUser.value || isLoading.value) return
   
+  console.log('🔘 Like button clicked, current state:', isLiked.value ? 'liked' : 'not liked')
+  
   const success = isLiked.value 
     ? await unlikeUser(props.targetUser.uid)
     : await likeUser(props.targetUser.uid)
+    
+  console.log('🔘 Like operation result:', success)
     
   if (success) {
     isLiked.value = !isLiked.value

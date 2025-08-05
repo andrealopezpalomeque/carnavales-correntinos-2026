@@ -106,11 +106,14 @@
                   </svg>
                   Descubrir Usuarios
                 </NuxtLink>
-                <NuxtLink to="/profile" @click="userMenuOpen = false" class="w-full text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2 p-2 rounded">
+                <NuxtLink to="/profile" @click="userMenuOpen = false" class="w-full text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2 p-2 rounded relative">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                   </svg>
                   Mi Perfil
+                  <span v-if="hasNotifications" class="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {{ totalNotifications }}
+                  </span>
                 </NuxtLink>
               </div>
               <button
@@ -282,6 +285,7 @@ const isUserDataReady = computed(() => {
 
 // Notifications
 const { notifyAuthSuccess, notifyAuthError, notifyLogout } = useNotifications()
+const { hasNotifications, totalNotifications, refreshNotificationCount } = useNotificationCount()
 
 // Close mobile menu
 const closeMobileMenu = () => {
@@ -369,6 +373,9 @@ watch(isAuthenticated, (authenticated, wasAuthenticated) => {
       // If on home page with hash, remove hash
       navigateTo('/')
     }
+  } else if (authenticated && !wasAuthenticated) {
+    // User logged in - refresh notifications
+    refreshNotificationCount()
   }
 })
 

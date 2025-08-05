@@ -124,7 +124,8 @@ const {
   sendFriendRequest, 
   respondToFriendRequest, 
   removeFriend, 
-  getRelationshipStatus 
+  getRelationshipStatus,
+  getFriendRequests
 } = useUserInteractions()
 
 // State
@@ -155,6 +156,15 @@ const loadRelationshipStatus = async () => {
     isLiked.value = status.isLiked
     isFriend.value = status.isFriend
     friendRequestStatus.value = status.friendRequestStatus
+    
+    // If we received a friend request, get the request ID
+    if (status.friendRequestStatus === 'received') {
+      const receivedRequests = await getFriendRequests('received')
+      const targetRequest = receivedRequests.find(req => req.fromUserId === props.targetUser.uid)
+      if (targetRequest) {
+        pendingFriendRequestId.value = targetRequest.id
+      }
+    }
   } catch (error) {
     console.error('Error loading relationship status:', error)
   }
@@ -215,12 +225,20 @@ const handleFriendAction = async () => {
 
 const handleFriendRequestResponse = async (response: 'accepted' | 'declined') => {
   if (!pendingFriendRequestId.value) {
-    // If we don't have the request ID, we need to fetch it
-    // For now, we'll just reload the status
-    await loadRelationshipStatus()
-    return
+    // If we don't have the request ID, fetch it first
+    console.log('No pending request ID, fetching friend requests...')
+    const receivedRequests = await getFriendRequests('received')
+    const targetRequest = receivedRequests.find(req => req.fromUserId === props.targetUser.uid)
+    if (targetRequest) {
+      pendingFriendRequestId.value = targetRequest.id
+    } else {
+      console.error('Could not find friend request ID')
+      await loadRelationshipStatus()
+      return
+    }
   }
   
+  console.log(`Responding to friend request ${pendingFriendRequestId.value} with ${response}`)
   const success = await respondToFriendRequest(pendingFriendRequestId.value, response)
   
   if (success) {
@@ -230,6 +248,7 @@ const handleFriendRequestResponse = async (response: 'accepted' | 'declined') =>
     } else {
       friendRequestStatus.value = 'none'
     }
+    pendingFriendRequestId.value = null // Clear the request ID
     emit('interactionUpdate')
   }
 }

@@ -93,11 +93,29 @@ export class PostService {
         isEdited: false
       }
 
-      await setDoc(postDoc, {
-        ...post,
+      // Prepare data for Firestore, removing undefined fields
+      const firestoreData: any = {
+        id: post.id,
+        authorId: post.authorId,
+        type: post.type,
+        content: post.content,
+        images: post.images,
+        privacy: post.privacy,
+        tags: post.tags,
+        likes: post.likes,
+        comments: post.comments,
+        shares: post.shares,
+        isEdited: post.isEdited,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
-      })
+      }
+
+      // Only add location if it has a value
+      if (post.location && post.location.trim()) {
+        firestoreData.location = post.location.trim()
+      }
+
+      await setDoc(postDoc, firestoreData)
 
       return { success: true, data: post }
     } catch (error: any) {
@@ -180,7 +198,15 @@ export class PostService {
       if (updateData.tags !== undefined) {
         updates.tags = updateData.tags.map(tag => tag.trim().toLowerCase())
       }
-      if (updateData.location !== undefined) updates.location = updateData.location?.trim()
+      if (updateData.location !== undefined) {
+        const trimmedLocation = updateData.location?.trim()
+        if (trimmedLocation) {
+          updates.location = trimmedLocation
+        } else {
+          // Remove the location field if it's empty
+          updates.location = null // Use null instead of undefined for Firestore
+        }
+      }
 
       await updateDoc(postRef, updates)
 

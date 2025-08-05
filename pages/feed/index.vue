@@ -1,24 +1,24 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <div class="container mx-auto px-4 max-w-2xl py-8">
+    <div class="container mx-auto px-4 max-w-2xl py-4 sm:py-8">
       <!-- Page Header -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Feed Social</h1>
-        <p class="text-gray-600">Mantente conectado con la comunidad de Carnavales Correntinos</p>
+      <div class="mb-6 sm:mb-8">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Feed Social</h1>
+        <p class="text-sm sm:text-base text-gray-600">Mantente conectado con la comunidad de Carnavales Correntinos</p>
       </div>
 
       <!-- Post Creator -->
-      <div class="mb-8">
+      <div class="mb-6 sm:mb-8">
         <PostCreator @post-created="handlePostCreated" />
       </div>
 
       <!-- Feed Controls -->
-      <div class="mb-6 flex items-center justify-between">
-        <div class="flex items-center space-x-4">
+      <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="flex items-center space-x-4 w-full sm:w-auto">
           <select
             v-model="feedFilter"
             @change="loadFeed"
-            class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 w-full sm:w-auto"
           >
             <option value="all">Todas las publicaciones</option>
             <option value="friends">Solo amigos</option>
@@ -30,7 +30,7 @@
         <button
           @click="refreshFeed"
           :disabled="isLoading"
-          class="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 transition-colors"
+          class="flex items-center justify-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 transition-colors w-full sm:w-auto"
         >
           <svg 
             class="w-4 h-4" 
@@ -41,7 +41,8 @@
           >
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
           </svg>
-          <span>Actualizar</span>
+          <span class="hidden sm:inline">Actualizar</span>
+          <span class="sm:hidden">🔄</span>
         </button>
       </div>
 

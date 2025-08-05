@@ -1,20 +1,20 @@
 <template>
   <article class="bg-white rounded-lg shadow-md overflow-hidden">
     <!-- Post Header -->
-    <div class="p-4 border-b border-gray-100">
+    <div class="p-3 sm:p-4 border-b border-gray-100">
       <div class="flex items-start justify-between">
-        <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-2 sm:space-x-3">
           <!-- Author Avatar -->
           <NuxtLink :to="`/profile/${post.author.uid}`" class="flex-shrink-0">
             <img 
               v-if="post.author.photoURL" 
               :src="post.author.photoURL" 
               :alt="post.author.displayName"
-              class="w-10 h-10 rounded-full object-cover hover:ring-2 hover:ring-green-500 transition-all"
+              class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover hover:ring-2 hover:ring-green-500 transition-all"
             />
             <div 
               v-else 
-              class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center text-sm font-bold hover:ring-2 hover:ring-green-500 transition-all"
+              class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-500 text-white flex items-center justify-center text-xs sm:text-sm font-bold hover:ring-2 hover:ring-green-500 transition-all"
             >
               {{ getInitials(post.author.displayName) }}
             </div>
@@ -33,13 +33,13 @@
               <!-- Carnival Badges -->
               <span 
                 v-if="post.author.favoriteComparsa" 
-                class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+                class="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
               >
                 🎆 {{ post.author.favoriteComparsa }}
               </span>
               <span 
                 v-if="post.author.favoriteAgrupacion" 
-                class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800"
+                class="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800"
               >
                 🎵 {{ post.author.favoriteAgrupacion }}
               </span>
@@ -117,7 +117,7 @@
     </div>
 
     <!-- Post Content -->
-    <div class="p-4">
+    <div class="p-3 sm:p-4">
       <!-- Text Content -->
       <div v-if="post.content" class="prose prose-sm max-w-none">
         <p class="text-gray-900 whitespace-pre-wrap break-words">{{ post.content }}</p>
@@ -150,7 +150,7 @@
     </div>
 
     <!-- Post Interactions -->
-    <div class="px-4 py-3 border-t border-gray-100">
+    <div class="px-3 sm:px-4 py-3 border-t border-gray-100">
       <!-- Interaction Stats -->
       <div v-if="post.likes > 0 || post.comments > 0" class="flex items-center justify-between text-sm text-gray-500 mb-3">
         <div class="flex items-center space-x-4">
@@ -168,40 +168,43 @@
 
       <!-- Interaction Buttons -->
       <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-1 sm:space-x-4">
           <!-- Like Button -->
           <button
             @click="toggleLike"
             :disabled="isLiking"
-            class="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+            class="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors duration-200"
             :class="userHasLiked ? 'text-red-600 bg-red-50 hover:bg-red-100' : 'text-gray-700 hover:bg-gray-100'"
           >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
             </svg>
-            <span>{{ userHasLiked ? 'Te gusta' : 'Me gusta' }}</span>
+            <span class="hidden sm:inline">{{ userHasLiked ? 'Te gusta' : 'Me gusta' }}</span>
+            <span class="sm:hidden">{{ userHasLiked ? '❤️' : '🤍' }}</span>
           </button>
 
           <!-- Comment Button -->
           <button
             @click="toggleComments"
-            class="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+            class="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
             </svg>
-            <span>Comentar</span>
+            <span class="hidden sm:inline">Comentar</span>
+            <span class="sm:hidden">💬</span>
           </button>
 
           <!-- Share Button (placeholder) -->
           <button
-            class="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+            class="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
             disabled
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
             </svg>
-            <span>Compartir</span>
+            <span class="hidden sm:inline">Compartir</span>
+            <span class="sm:hidden">📤</span>
           </button>
         </div>
       </div>

@@ -1,16 +1,16 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6">
-    <div class="flex items-start space-x-4">
+  <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+    <div class="flex items-start space-x-3 sm:space-x-4">
       <!-- User Avatar -->
       <img 
         v-if="authUser?.photoURL" 
         :src="authUser.photoURL" 
         :alt="authUser.displayName || 'Usuario'"
-        class="w-12 h-12 rounded-full object-cover flex-shrink-0"
+        class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0"
       />
       <div 
         v-else 
-        class="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center text-lg font-bold flex-shrink-0"
+        class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-green-500 text-white flex items-center justify-center text-base sm:text-lg font-bold flex-shrink-0"
       >
         {{ getInitials(authUser?.displayName || authUser?.email || 'U') }}
       </div>
@@ -41,14 +41,14 @@
           </div>
 
           <!-- Post Options -->
-          <div class="flex flex-wrap items-center gap-4">
+          <div class="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3 sm:gap-4">
             <!-- Privacy Setting -->
-            <div class="flex items-center space-x-2">
-              <label for="privacy" class="text-sm font-medium text-gray-700">Privacidad:</label>
+            <div class="flex items-center space-x-2 w-full sm:w-auto">
+              <label for="privacy" class="text-sm font-medium text-gray-700 shrink-0">Privacidad:</label>
               <select
                 id="privacy"
                 v-model="postPrivacy"
-                class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
+                class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500 flex-1 sm:flex-none"
               >
                 <option value="public">🌍 Público</option>
                 <option value="friends">👥 Solo amigos</option>
@@ -62,14 +62,14 @@
             </div>
 
             <!-- Location (Optional) -->
-            <div class="flex items-center space-x-2">
-              <label for="location" class="text-sm font-medium text-gray-700">📍</label>
+            <div class="flex items-center space-x-2 w-full sm:w-auto">
+              <label for="location" class="text-sm font-medium text-gray-700 shrink-0">📍</label>
               <input
                 id="location"
                 v-model="postLocation"
                 type="text"
                 placeholder="Agregar ubicación..."
-                class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
+                class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500 flex-1 sm:flex-none"
                 :maxlength="POST_CONSTRAINTS.MAX_LOCATION_LENGTH"
               />
             </div>

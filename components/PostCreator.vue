@@ -283,7 +283,7 @@ const createPost = async () => {
       type: 'text',
       content: postContent.value.trim(),
       privacy: postPrivacy.value,
-      location: finalLocation || undefined,
+      ...(finalLocation && { location: finalLocation }),
       tags: parseTags(postTags.value)
     }
 

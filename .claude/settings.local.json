@@ -12,7 +12,9 @@
       "Bash(npm run build:*)",
       "Bash(chmod:*)",
       "Bash(firebase deploy:*)",
-      "Bash(npm run deploy:*)"
+      "Bash(npm run deploy:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run lint)"
     ],
     "deny": []
   }

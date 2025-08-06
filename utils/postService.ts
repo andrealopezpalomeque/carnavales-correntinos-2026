@@ -13,6 +13,7 @@ import {
   startAfter, 
   serverTimestamp,
   increment,
+  deleteField,
   type DocumentData,
   type QueryConstraint,
   type DocumentSnapshot,
@@ -84,7 +85,7 @@ export class PostService {
         images: postData.images || [],
         privacy: postData.privacy,
         tags: postData.tags?.map(tag => tag.trim().toLowerCase()) || [],
-        location: postData.location?.trim() || undefined,
+        ...(postData.location && postData.location.trim() && { location: postData.location.trim() }),
         createdAt: new Date(),
         updatedAt: new Date(),
         likes: 0,
@@ -110,8 +111,8 @@ export class PostService {
         updatedAt: serverTimestamp()
       }
 
-      // Only add location if it has a value
-      if (post.location && post.location.trim()) {
+      // Only add location if it has a value and is not undefined
+      if (post.location && typeof post.location === 'string' && post.location.trim()) {
         firestoreData.location = post.location.trim()
       }
 
@@ -203,8 +204,8 @@ export class PostService {
         if (trimmedLocation) {
           updates.location = trimmedLocation
         } else {
-          // Remove the location field if it's empty
-          updates.location = null // Use null instead of undefined for Firestore
+          // Use FieldValue.delete() to properly remove the field from Firestore
+          updates.location = deleteField()
         }
       }
 

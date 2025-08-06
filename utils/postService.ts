@@ -9,7 +9,7 @@ import {
   query, 
   where, 
   orderBy, 
-  limit, 
+  limit as firestoreLimit, 
   startAfter, 
   serverTimestamp,
   increment,
@@ -257,7 +257,7 @@ export class PostService {
       const q = query(
         postsRef, 
         where('authorId', '==', userId),
-        limit(limitCount * 2) // Get more posts to allow for in-memory sorting
+        firestoreLimit(limitCount * 2) // Get more posts to allow for in-memory sorting
       )
       
       const querySnapshot = await getDocs(q)
@@ -344,7 +344,7 @@ export class PostService {
           const constraints: QueryConstraint[] = [
             where('authorId', '==', userId),
             orderBy('createdAt', 'desc'),
-            limit(queryOptions.limit || 20)
+            firestoreLimit(queryOptions.limit || 20)
           ]
           
           const q = query(postsRef, ...constraints)
@@ -383,7 +383,7 @@ export class PostService {
               where('authorId', 'in', batch),
               where('privacy', 'in', ['public', 'friends']),
               orderBy('createdAt', 'desc'),
-              limit(queryOptions.limit || 20)
+              firestoreLimit(queryOptions.limit || 20)
             ]
 
             const q = query(postsRef, ...constraints)
@@ -418,7 +418,7 @@ export class PostService {
         const constraints: QueryConstraint[] = [
           where('privacy', '==', 'public'),
           orderBy('createdAt', 'desc'),
-          limit(queryOptions.limit || 20)
+          firestoreLimit(queryOptions.limit || 20)
         ]
         
         const q = query(postsRef, ...constraints)
@@ -578,6 +578,308 @@ export class PostService {
     }
   }
 
+  // ============== COMMENT OPERATIONS ==============
+
+  async createComment(postId: string, userId: string, content: string, parentCommentId?: string): Promise<CommentResponse> {
+    try {
+      const db = this.ensureFirestore()
+      const commentsRef = collection(db, 'postComments')
+      const commentDoc = doc(commentsRef)
+
+      const comment: PostComment = {
+        id: commentDoc.id,
+        postId,
+        authorId: userId,
+        content: content.trim(),
+        parentCommentId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        likes: 0
+      }
+
+      // Prepare data for Firestore, removing undefined fields
+      const firestoreData: any = {
+        id: comment.id,
+        postId: comment.postId,
+        authorId: comment.authorId,
+        content: comment.content,
+        likes: comment.likes,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      }
+
+      // Only add parentCommentId if it has a value
+      if (parentCommentId && parentCommentId.trim()) {
+        firestoreData.parentCommentId = parentCommentId.trim()
+      }
+
+      await setDoc(commentDoc, firestoreData)
+
+      // Update post comment counter
+      const postRef = doc(db, 'posts', postId)
+      await updateDoc(postRef, {
+        comments: increment(1)
+      })
+
+      return { success: true, data: comment }
+    } catch (error: any) {
+      console.error('Error creating comment:', error)
+      return { success: false, error: error.message || 'Error al crear el comentario' }
+    }
+  }
+
+  async getComments(postId: string, limitCount: number = 20): Promise<CommentsResponse> {
+    try {
+      const db = this.ensureFirestore()
+      const commentsRef = collection(db, 'postComments')
+      
+      // Get top-level comments (no parent comment)
+      // Note: Removed orderBy to avoid composite index requirement
+      // We'll sort in memory instead
+      const q = query(
+        commentsRef,
+        where('postId', '==', postId),
+        firestoreLimit(limitCount * 2) // Get more to account for filtering
+      )
+
+      const querySnapshot = await getDocs(q)
+      
+      let comments: PostComment[] = []
+      querySnapshot.forEach(doc => {
+        const data = doc.data()
+        // Only include top-level comments (no parent)
+        if (!data.parentCommentId) {
+          comments.push({
+            id: doc.id,
+            postId: data.postId,
+            authorId: data.authorId,
+            content: data.content,
+            parentCommentId: data.parentCommentId,
+            createdAt: data.createdAt?.toDate() || new Date(),
+            updatedAt: data.updatedAt?.toDate() || new Date(),
+            likes: data.likes || 0,
+            isEdited: data.isEdited || false,
+            editHistory: data.editHistory || []
+          })
+        }
+      })
+
+      // Sort comments by creation date (newest first) since we removed orderBy from query
+      comments.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      
+      // Apply the original limit after sorting
+      const hasMore = comments.length > limitCount
+      if (hasMore) {
+        comments = comments.slice(0, limitCount)
+      }
+
+      return {
+        success: true,
+        data: comments,
+        hasMore
+      }
+    } catch (error: any) {
+      console.error('Error getting comments:', error)
+      return { success: false, error: error.message || 'Error al obtener los comentarios' }
+    }
+  }
+
+  async getReplies(commentId: string, limitCount: number = 10): Promise<CommentsResponse> {
+    try {
+      const db = this.ensureFirestore()
+      const commentsRef = collection(db, 'postComments')
+      
+      // Get replies (avoiding composite index requirement)
+      const q = query(
+        commentsRef,
+        where('parentCommentId', '==', commentId),
+        firestoreLimit(limitCount * 2)
+      )
+
+      const querySnapshot = await getDocs(q)
+      
+      let replies: PostComment[] = []
+      querySnapshot.forEach(doc => {
+        const data = doc.data()
+        replies.push({
+          id: doc.id,
+          postId: data.postId,
+          authorId: data.authorId,
+          content: data.content,
+          parentCommentId: data.parentCommentId,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date(),
+          likes: data.likes || 0,
+          isEdited: data.isEdited || false,
+          editHistory: data.editHistory || []
+        })
+      })
+
+      // Sort replies by creation date (oldest first for conversational flow)
+      replies.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+      
+      // Apply the original limit after sorting
+      const hasMore = replies.length > limitCount
+      if (hasMore) {
+        replies = replies.slice(0, limitCount)
+      }
+
+      return {
+        success: true,
+        data: replies,
+        hasMore
+      }
+    } catch (error: any) {
+      console.error('Error getting replies:', error)
+      return { success: false, error: error.message || 'Error al obtener las respuestas' }
+    }
+  }
+
+  async updateComment(commentId: string, userId: string, content: string): Promise<CommentResponse> {
+    try {
+      const db = this.ensureFirestore()
+      const commentRef = doc(db, 'postComments', commentId)
+      const commentSnap = await getDoc(commentRef)
+
+      if (!commentSnap.exists()) {
+        return { success: false, error: 'Comentario no encontrado' }
+      }
+
+      const commentData = commentSnap.data()
+      if (commentData.authorId !== userId) {
+        return { success: false, error: 'No tienes permisos para editar este comentario' }
+      }
+
+      const updates = {
+        content: content.trim(),
+        updatedAt: serverTimestamp(),
+        isEdited: true
+      }
+
+      // Add to edit history if content changed
+      if (commentData.content !== content.trim()) {
+        const editHistory = commentData.editHistory || []
+        editHistory.push({
+          content: commentData.content,
+          editedAt: serverTimestamp()
+        })
+        updates.editHistory = editHistory
+      }
+
+      await updateDoc(commentRef, updates)
+
+      return await this.getComment(commentId)
+    } catch (error: any) {
+      console.error('Error updating comment:', error)
+      return { success: false, error: error.message || 'Error al actualizar el comentario' }
+    }
+  }
+
+  async deleteComment(commentId: string, userId: string): Promise<CommentResponse> {
+    try {
+      const db = this.ensureFirestore()
+      const commentRef = doc(db, 'postComments', commentId)
+      const commentSnap = await getDoc(commentRef)
+
+      if (!commentSnap.exists()) {
+        return { success: false, error: 'Comentario no encontrado' }
+      }
+
+      const commentData = commentSnap.data()
+      if (commentData.authorId !== userId) {
+        return { success: false, error: 'No tienes permisos para eliminar este comentario' }
+      }
+
+      // Delete the comment
+      await deleteDoc(commentRef)
+
+      // Delete any replies to this comment
+      const repliesRef = collection(db, 'postComments')
+      const repliesQuery = query(repliesRef, where('parentCommentId', '==', commentId))
+      const repliesSnapshot = await getDocs(repliesQuery)
+      
+      const deletePromises = repliesSnapshot.docs.map(doc => deleteDoc(doc.ref))
+      await Promise.all(deletePromises)
+
+      // Update post comment counter
+      const postRef = doc(db, 'posts', commentData.postId)
+      const decrementAmount = 1 + repliesSnapshot.docs.length // Main comment + replies
+      await updateDoc(postRef, {
+        comments: increment(-decrementAmount)
+      })
+
+      return { success: true }
+    } catch (error: any) {
+      console.error('Error deleting comment:', error)
+      return { success: false, error: error.message || 'Error al eliminar el comentario' }
+    }
+  }
+
+  async getComment(commentId: string): Promise<CommentResponse> {
+    try {
+      const db = this.ensureFirestore()
+      const commentRef = doc(db, 'postComments', commentId)
+      const commentSnap = await getDoc(commentRef)
+
+      if (!commentSnap.exists()) {
+        return { success: false, error: 'Comentario no encontrado' }
+      }
+
+      const data = commentSnap.data()
+      const comment: PostComment = {
+        id: commentSnap.id,
+        postId: data.postId,
+        authorId: data.authorId,
+        content: data.content,
+        parentCommentId: data.parentCommentId,
+        createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date(),
+        likes: data.likes || 0,
+        isEdited: data.isEdited || false,
+        editHistory: data.editHistory || []
+      }
+
+      return { success: true, data: comment }
+    } catch (error: any) {
+      console.error('Error getting comment:', error)
+      return { success: false, error: error.message || 'Error al obtener el comentario' }
+    }
+  }
+
+  async enrichCommentWithAuthor(comment: PostComment): Promise<CommentWithAuthor | null> {
+    try {
+      const author = await dbService.getUserProfile(comment.authorId)
+      if (!author) return null
+
+      const commentWithAuthor: CommentWithAuthor = {
+        ...comment,
+        author: {
+          uid: author.uid,
+          displayName: author.displayName || 'Usuario',
+          photoURL: author.photoURL
+        }
+      }
+
+      return commentWithAuthor
+    } catch (error) {
+      console.error('Error enriching comment with author:', error)
+      return null
+    }
+  }
+
+  async enrichCommentsWithAuthors(comments: PostComment[]): Promise<CommentWithAuthor[]> {
+    const enrichedComments: CommentWithAuthor[] = []
+    
+    for (const comment of comments) {
+      const enrichedComment = await this.enrichCommentWithAuthor(comment)
+      if (enrichedComment) {
+        enrichedComments.push(enrichedComment)
+      }
+    }
+    
+    return enrichedComments
+  }
+
   // ============== HELPER METHODS ==============
 
   async enrichPostWithAuthor(post: UserPost): Promise<PostWithAuthor | null> {
@@ -636,7 +938,16 @@ export const posts = {
   like: (postId: string, userId: string) => postService.likePost(postId, userId),
   unlike: (postId: string, userId: string) => postService.unlikePost(postId, userId),
   
+  // Comment operations
+  createComment: (postId: string, userId: string, content: string, parentCommentId?: string) => postService.createComment(postId, userId, content, parentCommentId),
+  getComments: (postId: string, limitCount?: number) => postService.getComments(postId, limitCount),
+  getReplies: (commentId: string, limitCount?: number) => postService.getReplies(commentId, limitCount),
+  updateComment: (commentId: string, userId: string, content: string) => postService.updateComment(commentId, userId, content),
+  deleteComment: (commentId: string, userId: string) => postService.deleteComment(commentId, userId),
+  
   // Utility operations
   enrichWithAuthor: (post: UserPost) => postService.enrichPostWithAuthor(post),
-  enrichWithAuthors: (posts: UserPost[]) => postService.enrichPostsWithAuthors(posts)
+  enrichWithAuthors: (posts: UserPost[]) => postService.enrichPostsWithAuthors(posts),
+  enrichCommentWithAuthor: (comment: PostComment) => postService.enrichCommentWithAuthor(comment),
+  enrichCommentsWithAuthors: (comments: PostComment[]) => postService.enrichCommentsWithAuthors(comments)
 }

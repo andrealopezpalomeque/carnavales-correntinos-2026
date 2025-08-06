@@ -210,12 +210,15 @@
       </div>
     </div>
 
-    <!-- Comments Section (placeholder) -->
-    <div v-if="showComments" class="border-t border-gray-100 bg-gray-50 p-4">
-      <div class="text-center text-gray-500 text-sm">
-        Los comentarios estarán disponibles pronto...
-      </div>
-    </div>
+    <!-- Comments Section -->
+    <CommentSection
+      v-if="showComments"
+      :post-id="post.id!"
+      :comments-count="post.comments"
+      :is-visible="showComments"
+      @comment-added="handleCommentAdded"
+      @comment-deleted="handleCommentDeleted"
+    />
 
     <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -413,6 +416,18 @@ const confirmDelete = async () => {
   } finally {
     isDeleting.value = false
   }
+}
+
+const handleCommentAdded = () => {
+  // Update post comment count optimistically
+  const updatedPost = { ...props.post, comments: props.post.comments + 1 }
+  emit('postUpdated', updatedPost)
+}
+
+const handleCommentDeleted = () => {
+  // Update post comment count optimistically
+  const updatedPost = { ...props.post, comments: Math.max(0, props.post.comments - 1) }
+  emit('postUpdated', updatedPost)
 }
 </script>
 

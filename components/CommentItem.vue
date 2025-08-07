@@ -82,43 +82,55 @@
         <div class="flex items-center space-x-4">
           <!-- Like Button (placeholder) -->
           <button
-            class="text-xs text-gray-500 hover:text-green-600 transition-colors"
+            class="flex items-center space-x-1 text-xs text-gray-500 hover:text-green-600 transition-colors"
             disabled
           >
-            👍 {{ comment.likes > 0 ? comment.likes : 'Me gusta' }}
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+            <span>{{ comment.likes > 0 ? comment.likes : 'Me gusta' }}</span>
           </button>
           
           <!-- Reply Button -->
           <button
             @click="handleReply"
-            class="text-xs text-gray-500 hover:text-green-600 transition-colors"
+            class="flex items-center space-x-1 text-xs text-gray-500 hover:text-green-600 transition-colors"
           >
-            💬 Responder
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+            <span>Responder</span>
           </button>
           
           <!-- Edit/Delete Menu -->
           <div v-if="canEditComment" class="relative">
             <button
               @click="showMenu = !showMenu"
-              class="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+              class="text-xs text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-md hover:bg-gray-100"
               @blur="showMenu = false"
             >
-              ⋯
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+              </svg>
             </button>
             
-            <div v-if="showMenu" class="absolute right-0 top-6 w-32 bg-white rounded-md shadow-lg border border-gray-200 z-10">
+            <div v-if="showMenu" class="absolute right-0 top-8 w-32 bg-white rounded-md shadow-lg border border-gray-200 z-50">
               <button
-                @click="startEdit"
+                @click="startEdit; showMenu = false"
                 class="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
               >
-                <span>✏️</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
                 <span>Editar</span>
               </button>
               <button
-                @click="deleteComment"
+                @click="deleteComment; showMenu = false"
                 class="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center space-x-2"
               >
-                <span>🗑️</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
                 <span>Eliminar</span>
               </button>
             </div>
@@ -204,9 +216,15 @@ const isDeleting = ref(false)
 const editTextarea = ref<HTMLTextAreaElement>()
 
 // Computed
-const canEditComment = computed(() => 
-  authUser.value?.uid === props.comment.authorId
-)
+const canEditComment = computed(() => {
+  const canEdit = authUser.value?.uid === props.comment.authorId
+  console.log('CommentItem - canEditComment check:', {
+    authUserId: authUser.value?.uid,
+    commentAuthorId: props.comment.authorId,
+    canEdit
+  })
+  return canEdit
+})
 
 const canSaveEdit = computed(() => {
   const trimmed = editText.value.trim()
@@ -252,7 +270,10 @@ const handleReply = () => {
   emit('reply', props.comment)
 }
 
-const startEdit = async () => {
+const startEdit = async (event?: Event) => {
+  if (event) {
+    event.stopPropagation()
+  }
   showMenu.value = false
   isEditing.value = true
   editText.value = props.comment.content
@@ -298,7 +319,10 @@ const saveEdit = async () => {
   }
 }
 
-const deleteComment = () => {
+const deleteComment = (event?: Event) => {
+  if (event) {
+    event.stopPropagation()
+  }
   showMenu.value = false
   showDeleteConfirm.value = true
 }
@@ -337,6 +361,7 @@ const handleEditKeyDown = (event: KeyboardEvent) => {
     cancelEdit()
   }
 }
+
 </script>
 
 <style scoped>

@@ -114,7 +114,7 @@
               </svg>
             </button>
             
-            <div v-if="showMenu" class="absolute right-0 top-8 w-32 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+            <div v-if="showMenu" class="absolute right-0 bottom-8 w-32 bg-white rounded-md shadow-lg border border-gray-200 z-50">
               <button
                 @click="startEdit; showMenu = false"
                 class="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-100 flex items-center space-x-2"

@@ -15,7 +15,6 @@ import {
   type Firestore 
 } from 'firebase/firestore'
 import { dbService } from '~/utils/database'
-import { isEmailWhitelisted, getWhitelistErrorMessage } from '~/utils/emailWhitelist'
 import type { 
   AuthUser, 
   UserProfile, 
@@ -289,30 +288,6 @@ export const useAuthEnhanced = () => {
       authState.isLoading = false
       
       if (firebaseUser) {
-        // Check email whitelist first
-        if (!isEmailWhitelisted(firebaseUser.email || '')) {
-          console.warn('Email not whitelisted:', firebaseUser.email)
-          
-          // Log unauthorized access attempt
-          await dbService.logUserAction(firebaseUser.uid, 'unauthorized_access_attempt', {
-            email: firebaseUser.email,
-            reason: 'email_not_whitelisted'
-          }).catch(() => {
-            // Ignore logging errors for unauthorized users
-          })
-          
-          // Sign out the user immediately
-          await signOut(auth)
-          
-          // Set error state
-          authState.authUser = null
-          authState.isAuthenticated = false
-          authState.userProfile = null
-          authState.isNewUser = false
-          authState.error = getWhitelistErrorMessage()
-          
-          return
-        }
         
         authState.authUser = mapFirebaseUser(firebaseUser)
         authState.isAuthenticated = true
@@ -381,26 +356,6 @@ export const useAuthEnhanced = () => {
       const result = await signInWithPopup(auth, provider)
       
       if (result.user) {
-        // Double-check email whitelist after successful Google auth
-        if (!isEmailWhitelisted(result.user.email || '')) {
-          console.warn('Email not whitelisted during sign-in:', result.user.email)
-          
-          // Log unauthorized access attempt
-          await dbService.logUserAction(result.user.uid, 'unauthorized_signin_attempt', {
-            email: result.user.email,
-            reason: 'email_not_whitelisted',
-            provider: 'google'
-          }).catch(() => {
-            // Ignore logging errors for unauthorized users
-          })
-          
-          // Sign out immediately
-          await signOut(auth)
-          
-          const errorMessage = getWhitelistErrorMessage()
-          authState.error = errorMessage
-          return { success: false, error: errorMessage }
-        }
         
         authState.authUser = mapFirebaseUser(result.user)
         authState.isAuthenticated = true

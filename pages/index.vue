@@ -1,8 +1,8 @@
 <template>
   <div class="min-h-screen flex flex-col">
-    <!-- Show unauthorized access component if there's an auth error indicating whitelist failure -->
-    <UnauthorizedAccess 
-      v-if="!isLoading && authError && authError.includes('autorizada')"
+    <!-- Show error component if there's a general authentication error -->
+    <UnauthorizedAccess
+      v-if="!isLoading && authError && authError.includes('Error')"
       :message="authError"
     />
     

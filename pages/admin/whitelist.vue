@@ -134,7 +134,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { ALLOWED_EMAILS } from '~/utils/emailWhitelist'
 import { dbService } from '~/utils/database'
 
 // Page meta
@@ -150,7 +149,6 @@ useSeoMeta({
 })
 
 // State
-const currentWhitelist = ref(ALLOWED_EMAILS)
 const blockedAttempts = ref(0)
 const activeUsers = ref(0)
 const recentAttempts = ref([])

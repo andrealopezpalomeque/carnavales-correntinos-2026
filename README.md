@@ -1,6 +1,30 @@
-# Nuxt Minimal Starter
+# Carnavales Correntinos 2026 🎭
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+**🌐 Live Demo:** [https://carnavales-correntinos-2026.web.app/](https://carnavales-correntinos-2026.web.app/)
+
+Una plataforma social interactiva dedicada a los Carnavales Correntinos 2026, la fiesta más importante de Argentina. Conecta con la comunidad carnavalera, descubre contenido exclusivo y vive la magia del carnaval todo el año.
+
+## ✨ Características Principales
+
+- **⏰ Countdown en Vivo** - Cuenta regresiva hasta el gran evento (31 de Enero 2026)
+- **📱 Red Social** - Publica, comenta e interactúa con la comunidad
+- **👤 Perfiles de Usuario** - Gestión completa de perfiles con avatares personalizados
+- **🔐 Autenticación** - Inicio de sesión con Google y sistema de lista blanca
+- **📸 Galería Exclusiva** - Fotos del carnaval para usuarios autenticados
+- **🎯 Datos Curiosos** - Trivia interactiva del carnaval con sistema de votación
+- **📰 Noticias** - Actualizaciones y noticias relacionadas con el carnaval
+- **🎵 Spotify Integration** - Playlists curadas para ambientar la fiesta
+- **⚙️ Panel de Admin** - Gestión de usuarios y contenido
+- **👥 Sistema de Amigos** - Conecta con otros fanáticos del carnaval
+- **📱 Diseño Responsivo** - Interfaz moderna con efectos de cristal y animaciones
+
+## 🛠️ Tecnologías
+
+- **Frontend:** Nuxt 3 (Vue.js)
+- **Backend:** Firebase (Auth, Firestore, Storage)
+- **Estilos:** Tailwind CSS
+- **Estado:** Pinia
+- **Despliegue:** Firebase Hosting
 
 ## Setup
 
